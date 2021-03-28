@@ -103,12 +103,17 @@ class Game:
             moves = across_moves + down_moves
 
         moves.sort(key=lambda move_: move_.score, reverse=True)
-        for move in moves[0:num]:
-            print(move)
+        # for move in moves[0:num]:
+        #     print(move)
+        return moves
 
     def show(self):
         """prints the board to terminal"""
         print(self.board)
+
+    def get_board(self):
+        """gets the board for this game"""
+        return self.board
     
     @staticmethod
     def __load_tile_set_from_file(filename) -> dict:
@@ -474,6 +479,9 @@ class Square:
 
     def set_cross_set(self, direction, new_set):
         self._cross_set[direction] = new_set
+
+    def get_tile(self):
+        return self._tile
 
     @property
     def effect(self):
