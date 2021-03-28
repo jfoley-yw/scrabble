@@ -1,5 +1,6 @@
 import scrabbler as sc
 import random
+import time
 
 LETTERS = """\
 AAAAAAAAAB\
@@ -54,6 +55,8 @@ def main():
     game = sc.Game()
     board = game.get_board()
 
+    times = []
+
     # Keep playing until we're out of tiles or solutions.
     while True:
         if player1Turn:
@@ -70,7 +73,9 @@ def main():
             # This function simply finds all valid moves and returns them ordered by score. The second parameter, which
             # is unused right now, used to limit the number of moves it returned, but I changed it so that all moves are
             # returned
+            before = time.time()
             best_move = game.find_best_moves(''.join(player1Rack))
+            times.append(time.time() - before)
 
             # If a valid move exists, then make best move, otherwise end game
             if best_move:
@@ -124,7 +129,9 @@ def main():
             # This function simply finds all valid moves and returns them ordered by score. The second parameter, which
             # is unused right now, used to limit the number of moves it returned, but I changed it so that all moves are
             # returned
+            before = time.time()
             best_move = game.find_best_moves(''.join(player2Rack))
+            times.append(time.time() - before)
 
             # If a valid move exists, then make best move, otherwise end game
             if best_move:
@@ -173,6 +180,7 @@ def main():
 
     print('\nGAME OVER!')
     print("PLAYER 1 SCORE: %d ...... PLAYER 2 SCORE: %d" % (player1Score, player2Score))
+    print('Average move-generation time:', sum(times) / len(times))
 
 
 if __name__ == "__main__":
