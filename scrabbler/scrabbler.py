@@ -103,8 +103,6 @@ class Game:
             moves = across_moves + down_moves
 
         moves.sort(key=lambda move_: move_.score, reverse=True)
-        # for move in moves[0:num]:
-        #     print(move)
         return moves
 
     def show(self):
