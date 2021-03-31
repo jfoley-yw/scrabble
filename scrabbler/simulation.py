@@ -88,6 +88,8 @@ class Simulation:
         before = time.time()
         best_moves = self.game.find_best_moves(''.join(self.racks[self.player]))
         self.times.append(time.time() - before)
+        if len(best_moves) == 0:
+            return None
         return best_moves[0]
 
     def make_move(self, move):
