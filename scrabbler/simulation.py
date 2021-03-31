@@ -86,7 +86,7 @@ class Simulation:
         # is unused right now, used to limit the number of moves it returned, but I changed it so that all moves are
         # returned
         before = time.time()
-        best_moves = self.game.find_best_moves(''.join(self.racks[self.player]))
+        best_moves = self.game.find_valid_moves(''.join(self.racks[self.player]))
         self.times.append(time.time() - before)
         if len(best_moves) == 0:
             return None

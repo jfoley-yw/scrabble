@@ -82,7 +82,7 @@ class Game:
             self.board.update_cross_set(coordinate, other_direction, self.dictionary)
             coordinate = self.board.offset(coordinate, direction, 1)
 
-    def find_best_moves(self, rack, num=5):
+    def find_valid_moves(self, rack):
         """returns the five best moves"""
 
         rack = list(rack)
