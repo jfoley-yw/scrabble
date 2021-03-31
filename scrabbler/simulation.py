@@ -62,9 +62,9 @@ class Simulation:
     def generate_new_rack(self):
         print("########################## Player %d turn ############################"%(self.player + 1))
         print("Bag: %s" % "".join(self.bag))
-        print("Player %d rack pre-draw: %s"%(self.player + 1, self.racks[self.player]))
+        print("Player %d rack pre-draw: %s" % (self.player + 1, self.racks[self.player]))
         self.generate_rack_and_bag()
-        print("Player %d rack post-draw: %s"%(self.player + 1, self.racks[self.player]))
+        print("Player %d rack post-draw: %s" % (self.player + 1, self.racks[self.player]))
 
     def generate_rack_and_bag(self):
         """Randomly chooses tiles from bag and places in rack"""
@@ -111,7 +111,7 @@ class Simulation:
 
         # Actually play the move here
         self.game.play(move.start_square, move.word, move.direction)
-        print("Player %d plays: %s"%(self.player + 1, move.word))
+        print("Player %d plays: %s" % (self.player + 1, move.word))
         self.scores[self.player] += move.score
 
     def remove_tile_from_rack(self, move, index):
