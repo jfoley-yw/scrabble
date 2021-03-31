@@ -110,9 +110,9 @@ class Game:
                 Game.DICTIONARY = Dictionary.load_from_pickle(saved_path)
             else:
                 logger.info("constructing dictionary...")
-                Game.DICTIONARY  = Dictionary.construct_with_text_file(read_path)
+                Game.DICTIONARY = Dictionary.construct_with_text_file(read_path)
                 logger.info("saving dictionary structure...")
-                Game.DICTIONARY .store(saved_path)
+                Game.DICTIONARY.store(saved_path)
         return Game.DICTIONARY
     
     @staticmethod
