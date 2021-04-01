@@ -15,6 +15,7 @@ full_saved_games_dir = os.path.join(script_dir, "../games/")
 
 class Game:
     """stores information about a game"""
+    DICTIONARY = None
 
     def __init__(self, filename="", board="wwf15"):
         """constructor for a game
@@ -48,15 +49,7 @@ class Game:
         # load the list of tiles and their corresponding scores
         self.tiles = self.__load_tile_set_from_file(tile_path)
 
-        # load a saved dictionary object or construct a new one
-        if os.path.exists(saved_dictionary_path):
-            logger.info("loading saved dictionary file...")
-            self.dictionary = Dictionary.load_from_pickle(saved_dictionary_path)
-        else:
-            logger.info("constructing dictionary...")
-            self.dictionary = Dictionary.construct_with_text_file(dictionary_path)
-            logger.info("saving dictionary structure...")
-            self.dictionary.store(saved_dictionary_path)
+        self.dictionary = self.get_dictionary(saved_dictionary_path, dictionary_path)
 
         logger.info("Game initialized successfully.")
 
@@ -89,7 +82,7 @@ class Game:
             self.board.update_cross_set(coordinate, other_direction, self.dictionary)
             coordinate = self.board.offset(coordinate, direction, 1)
 
-    def find_best_moves(self, rack, num=5):
+    def find_valid_moves(self, rack):
         """returns the five best moves"""
 
         rack = list(rack)
@@ -109,9 +102,18 @@ class Game:
         """prints the board to terminal"""
         print(self.board)
 
-    def get_board(self):
-        """gets the board for this game"""
-        return self.board
+    def get_dictionary(self, saved_path, read_path):
+        if not Game.DICTIONARY:
+            # load a saved dictionary object or construct a new one
+            if os.path.exists(saved_path):
+                logger.info("loading saved dictionary file...")
+                Game.DICTIONARY = Dictionary.load_from_pickle(saved_path)
+            else:
+                logger.info("constructing dictionary...")
+                Game.DICTIONARY = Dictionary.construct_with_text_file(read_path)
+                logger.info("saving dictionary structure...")
+                Game.DICTIONARY.store(saved_path)
+        return Game.DICTIONARY
     
     @staticmethod
     def __load_tile_set_from_file(filename) -> dict:
@@ -477,9 +479,6 @@ class Square:
 
     def set_cross_set(self, direction, new_set):
         self._cross_set[direction] = new_set
-
-    def get_tile(self):
-        return self._tile
 
     @property
     def effect(self):
