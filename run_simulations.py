@@ -1,4 +1,5 @@
 from scrabbler.simulation import Simulation
+from scrabbler.player import Player
 import sys
 
 def main():

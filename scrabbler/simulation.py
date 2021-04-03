@@ -1,6 +1,9 @@
 from scrabbler.scrabbler import Game
+from scrabbler.player import Player, Strategy
 import random
 import time
+import random
+
 
 class Simulation:
     LETTERS = ("AAAAAAAAAB"
@@ -18,26 +21,25 @@ class Simulation:
 
     @staticmethod
     def simulate_game():
-        Simulation().simulate()
+        Simulation(Player(Strategy()), Player(Strategy())).simulate()
 
-    def __init__(self):
+    def __init__(self, player1, player2):
         # Initialize game and board
         self.game = Game()
         self.board = self.game.board
-        # Rack starts out empty.
-        self.racks = [[], []]
-        self.scores = [0, 0]
-        # List of letters we can still pick from.
+        # List of letters we can still  pick from.
         self.bag = list(Simulation.LETTERS)
-        self.player = 0
+        # randomly choose which player goes first so that it varies during each simulation
+        self.player = random.randint(0,1) 
         self.endgame = False
         self.times = []
+        self.players = (player1, player2)
 
     def simulate(self):
         # Keep playing until we're out of tiles or solutions.
         while self.exectute_turn():
             # switch whose turn it is
-            self.player = 1 - self.player
+            self.player= 1 - self.player
             # Show the game board. We could have also done print(board) here.
             self.game.show()
 
@@ -46,11 +48,11 @@ class Simulation:
     def exectute_turn(self):
         self.generate_new_rack()
 
-        # End game once either player has no letters left
-        if not self.racks[self.player]:
+        # End of the game once either player has no letters left
+        if self.players[self.player].is_rack_empty():
             return False
 
-        best_move = self.find_best_move()
+        best_move = self.players[self.player].choose_move(self.endgame, self.game)
 
         # If a valid move exists, then make best move, otherwise end game
         if best_move:
@@ -60,15 +62,17 @@ class Simulation:
             return False
 
     def generate_new_rack(self):
+        """ Generates new rack after drawing tiles from the bag and prints out the new rack before and after the draw."""
         print("########################## Player %d turn ############################"%(self.player + 1))
         print("Bag: %s" % "".join(self.bag))
-        print("Player %d rack pre-draw: %s" % (self.player + 1, self.racks[self.player]))
+        print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
         self.generate_rack_and_bag()
-        print("Player %d rack post-draw: %s" % (self.player + 1, self.racks[self.player]))
+        print("Player %d rack post-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
 
     def generate_rack_and_bag(self):
         """Randomly chooses tiles from bag and places in rack"""
-        for i in range(Simulation.RACK_SIZE - len(self.racks[self.player])):
+        new_letters = []
+        for i in range(Simulation.RACK_SIZE - len(self.players[self.player].get_rack())):
             # If bag has ended then end game begins (as of right now this 
             # doesn't formally mean anything, just print statement)
             if not self.bag:
@@ -78,21 +82,23 @@ class Simulation:
                 break
 
             new_tile = random.choice(self.bag)
-            self.racks[self.player].append(new_tile)
+            new_letters.append(new_tile)
             self.bag.remove(new_tile)
+        self.players[self.player].update_rack(new_letters)
 
-    def find_best_move(self):
-        # This function simply finds all valid moves and returns them ordered by score. The second parameter, which
-        # is unused right now, used to limit the number of moves it returned, but I changed it so that all moves are
-        # returned
-        before = time.time()
-        best_moves = self.game.find_valid_moves(''.join(self.racks[self.player]))
-        self.times.append(time.time() - before)
-        if len(best_moves) == 0:
-            return None
-        return best_moves[0]
+    # def generate_moves(self):
+    #     # This function simply finds all valid moves and returns them ordered by score. The second parameter, which
+    #     # is unused right now, used to limit the number of moves it returned, but I changed it so that all moves are
+    #     # returned
+    #     before = time.time()
+    #     best_moves = self.game.find_valid_moves(''.join(self.players[self.player].get_rack()))
+    #     self.times.append(time.time() - before)
+    #     if len(best_moves) == 0:
+    #         return None
+    #     return best_moves[0]
 
     def make_move(self, move):
+        """ Places given move on the board and removes tiles from the rack"""
         start_row = move.start_square[0]
         start_column = move.start_square[1]
 
@@ -105,25 +111,19 @@ class Simulation:
         if move.direction == "across":
             for i in range(start_column, start_column + len(move.word)):
                 if self.board.square(start_row, i).tile is None:
-                    self.remove_tile_from_rack(move, i - start_column)
+                    self.players[self.player].remove_tile_from_rack(move, i - start_column)
         else:
             for i in range(start_row, start_row + len(move.word)):
                 if self.board.square(i, start_column).tile is None:
-                    self.remove_tile_from_rack(move, i - start_row)
+                    self.players[self.player].remove_tile_from_rack(move, i - start_row)
 
         # Actually play the move here
         self.game.play(move.start_square, move.word, move.direction)
         print("Player %d plays: %s" % (self.player + 1, move.word))
-        self.scores[self.player] += move.score
-
-    def remove_tile_from_rack(self, move, index):
-        # if letter is not in word then it must be because a ? was used to make letter
-        if move.word[index] not in self.racks[self.player]:
-            self.racks[self.player].remove('?')
-        else:
-            self.racks[self.player].remove(move.word[index])
+        self.players[self.player].update_score(move.score)
 
     def print_end_game_message(self):
-        print('\nGAME OVER!')
-        print("PLAYER 1 SCORE: %d ...... PLAYER 2 SCORE: %d" % (self.scores[0], self.scores[1]))
-        print('Average move-generation time:', sum(self.times) / len(self.times))
+        print("\nGAME OVER!")
+        print("PLAYER 1 SCORE: %d ...... PLAYER 2 SCORE: %d" % (self.players[0].get_score(), self.players[1].get_score()))
+        #commented this out because i was getting a divide by zero error
+        #print('Average move-generation time:', sum(self.times) / len(self.times)) 
