@@ -1,7 +1,7 @@
 from scrabbler.scrabbler import Game
-from scrabbler.player import Player, Strategy
-import random
-import time
+from scrabbler.player import Player
+from scrabbler.strategy import Strategy
+
 import random
 
 
@@ -32,47 +32,54 @@ class Simulation:
         # randomly choose which player goes first so that it varies during each simulation
         self.player = random.randint(0,1) 
         self.endgame = False
-        self.times = []
         self.players = (player1, player2)
+
+        # fills the players racks to start the game
+        self.generate_rack_and_bag(0)
+        self.generate_rack_and_bag(1)
 
     def simulate(self):
         # Keep playing until we're out of tiles or solutions.
         while self.exectute_turn():
             # switch whose turn it is
-            self.player= 1 - self.player
+            self.player = 1 - self.player
             # Show the game board. We could have also done print(board) here.
             self.game.show()
 
         self.print_end_game_message()
 
     def exectute_turn(self):
-        self.generate_new_rack()
+
 
         # End of the game once either player has no letters left
         if self.players[self.player].is_rack_empty():
             return False
 
+        print("########################## Player %d turn ############################"%(self.player + 1))
+        print("Bag: %s" % "".join(self.bag))
+        print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
         best_move = self.players[self.player].choose_move(self.endgame, self.game)
 
         # If a valid move exists, then make best move, otherwise end game
         if best_move:
             self.make_move(best_move)
+            self.generate_new_rack()
             return True
         else:
             return False
+        
+        
+
 
     def generate_new_rack(self):
         """ Generates new rack after drawing tiles from the bag and prints out the new rack before and after the draw."""
-        print("########################## Player %d turn ############################"%(self.player + 1))
-        print("Bag: %s" % "".join(self.bag))
-        print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
-        self.generate_rack_and_bag()
+        self.generate_rack_and_bag(self.player)
         print("Player %d rack post-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
 
-    def generate_rack_and_bag(self):
+    def generate_rack_and_bag(self, player):
         """Randomly chooses tiles from bag and places in rack"""
         new_letters = []
-        for i in range(Simulation.RACK_SIZE - len(self.players[self.player].get_rack())):
+        for i in range(Simulation.RACK_SIZE - len(self.players[player].get_rack())):
             # If bag has ended then end game begins (as of right now this 
             # doesn't formally mean anything, just print statement)
             if not self.bag:
@@ -84,18 +91,7 @@ class Simulation:
             new_tile = random.choice(self.bag)
             new_letters.append(new_tile)
             self.bag.remove(new_tile)
-        self.players[self.player].update_rack(new_letters)
-
-    # def generate_moves(self):
-    #     # This function simply finds all valid moves and returns them ordered by score. The second parameter, which
-    #     # is unused right now, used to limit the number of moves it returned, but I changed it so that all moves are
-    #     # returned
-    #     before = time.time()
-    #     best_moves = self.game.find_valid_moves(''.join(self.players[self.player].get_rack()))
-    #     self.times.append(time.time() - before)
-    #     if len(best_moves) == 0:
-    #         return None
-    #     return best_moves[0]
+        self.players[player].update_rack(new_letters)
 
     def make_move(self, move):
         """ Places given move on the board and removes tiles from the rack"""
@@ -125,5 +121,4 @@ class Simulation:
     def print_end_game_message(self):
         print("\nGAME OVER!")
         print("PLAYER 1 SCORE: %d ...... PLAYER 2 SCORE: %d" % (self.players[0].get_score(), self.players[1].get_score()))
-        #commented this out because i was getting a divide by zero error
-        #print('Average move-generation time:', sum(self.times) / len(self.times)) 
+
