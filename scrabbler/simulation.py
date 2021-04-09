@@ -6,29 +6,48 @@ import random
 
 
 class Simulation:
-    LETTERS = ("AAAAAAAAAB"
-               "BCCDDDDEEE"
-               "EEEEEEEEEF"
-               "FGGGHHIIII"
-               "IIIIIJKLLL"
-               "LMMNNNNNNO"
-               "OOOOOOOPPQ"
-               "RRRRRRSSSS"
-               "TTTTTTUUUU"
-               "VVWWXYYZ??")
+    # LETTERS = ("AAAAAAAAAB"
+    #            "BCCDDDDEEE"
+    #            "EEEEEEEEEF"
+    #            "FGGGHHIIII"
+    #            "IIIIIJKLLL"
+    #            "LMMNNNNNNO"
+    #            "OOOOOOOPPQ"
+    #            "RRRRRRSSSS"
+    #            "TTTTTTUUUU"
+    #            "VVWWXYYZ")  # TODO - deleted the question marks to remove issue of deducing bag
+
+    LETTERS = ("AAAB"
+               "EEE"
+               "EE"
+               "FII"
+               "IJKL"
+               "LMO")
     
     RACK_SIZE = 7
 
     @staticmethod
     def simulate_game():
-        Simulation(Player(Strategy()), Player(Strategy())).simulate()
+        Simulation(Player(MCTSStrategy(num_rollouts=50), is_player1=True), Player(Strategy(), is_player1=False)).simulate()
 
-    def __init__(self, player1, player2):
+    def __init__(self, player1, player2, game=None, bag=None):
         # Initialize game and board
-        self.game = Game()
+        if game is None:
+            self.game = Game()
+            # Andrew - I want to be able to give dictioanry object to MCTS strat
+            # to use when it uses its own move generation algorithm in its simulations
+            if type(player1.mid_strat) is MCTSStrategy:
+                player1.mid_strat.add_dictionary(self.game.get_this_dictionary())
+            if type(player2.mid_strat) is MCTSStrategy:
+                player2.mid_strat.add_dictionary(self.game.get_this_dictionary())
+        else:
+            self.game = game
         self.board = self.game.board
         # List of letters we can still  pick from.
-        self.bag = list(Simulation.LETTERS)
+        if bag is None:
+            self.bag = list(Simulation.LETTERS)
+        else:
+            self.bag = bag
         # randomly choose which player goes first so that it varies during each simulation
         self.player = random.randint(0,1) 
         self.endgame = False
@@ -58,7 +77,14 @@ class Simulation:
         print("########################## Player %d turn ############################"%(self.player + 1))
         print("Bag: %s" % "".join(self.bag))
         print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
-        best_move = self.players[self.player].choose_move(self.endgame, self.game)
+        
+        if self.player == 0:
+            other_player = 1
+        else:
+            other_player = 0
+
+        best_move = self.players[self.player].choose_move(self.endgame, self.game, self.players[other_player].get_score())
+
 
         # If a valid move exists, then make best move, otherwise end game
         if best_move:

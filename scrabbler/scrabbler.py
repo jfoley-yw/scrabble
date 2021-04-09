@@ -53,6 +53,12 @@ class Game:
 
         logger.info("Game initialized successfully.")
 
+    # Andrew - add-on so that we can pass around dictionary object without having
+    # to reload. This is so that the move generation algorithm can be run in MCTS
+    # simulations and not affect the actual game.
+    def get_this_dictionary(self):
+        return self.dictionary
+
     def save(self, filename=None):
         """saves an unfinished game to disk"""
 
@@ -162,6 +168,9 @@ class Board:
             row_string = "  ".join(tile if tile else "-" for tile in row)
             board_string = board_string + row_string + "\n"
         return board_string
+
+    def get_board(self):
+        return self._board
 
     def square(self, row, col):
         """gets the square on the given coordinate, return None if out of bounds"""

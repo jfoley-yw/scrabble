@@ -2,7 +2,7 @@ class Player:
     '''
     Player Class represents a player in scrabble that takes in a midgame strategy and an optional endgame strategy. 
     '''
-    def __init__ (self, midgame_strategy, endgame_strategy=None, name=None):
+    def __init__ (self, midgame_strategy, endgame_strategy=None, name=None, is_player1=True):
         self.mid_strat = midgame_strategy
         # If no end game strategy is specified, the midgame strategy will be applied as the endgame.
         if endgame_strategy is None:
@@ -16,12 +16,18 @@ class Player:
 
         self.name = name # might be useful for plotting during analysis
 
+        self.is_player1 = is_player1
+
     def choose_move(self, is_endgame, game):
         # chooses a move for the player based on the endgame and midgame strategies
-        if is_endgame:
-            return self.end_strat.choose_move(game, self.rack)
+        if self.is_player1:
+            current_score_differential = self.score - other_player_score
         else:
-            return self.mid_strat.choose_move(game, self.rack)
+            current_score_differential = other_player_score - self.score
+        if is_endgame:
+            return self.end_strat.choose_move(game, self.rack, current_score_differential, self.is_player1)
+        else:
+            return self.mid_strat.choose_move(game, self.rack, current_score_differential, self.is_player1)
         
 
     def is_rack_empty(self):
