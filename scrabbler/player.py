@@ -50,4 +50,3 @@ class Player:
     def get_score(self):
         """ getter for the player's score"""
         return self.score
-    
