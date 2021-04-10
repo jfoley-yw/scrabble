@@ -5,6 +5,10 @@ class Strategy:
     subclass of this class and override the method choose move.
     '''
     def choose_move(self, game, rack):
+        raise Exception('Method not defined!')
+
+class BaselineStrategy(Strategy):
+    def choose_move(self, game, rack):
         """ method that chooses the best move"""
 
         # return the valid move with the highest score
