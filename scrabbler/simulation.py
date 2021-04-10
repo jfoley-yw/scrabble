@@ -1,6 +1,7 @@
 from scrabbler.scrabbler import Game
 from scrabbler.player import Player
 from scrabbler.strategy import Strategy
+from scrabbler.MCTSStrategy import MCTSStrategy
 
 import random
 

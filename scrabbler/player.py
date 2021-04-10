@@ -18,7 +18,7 @@ class Player:
 
         self.is_player1 = is_player1
 
-    def choose_move(self, is_endgame, game):
+    def choose_move(self, is_endgame, game, other_player_score):
         # chooses a move for the player based on the endgame and midgame strategies
         if self.is_player1:
             current_score_differential = self.score - other_player_score

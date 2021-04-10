@@ -1,3 +1,12 @@
+import copy
+import random
+import math
+
+from scrabbler.strategy import Strategy
+from collections import defaultdict
+from scrabbler.gameState import GameState
+
+
 ''' Node must be represented by a state of the board/rack/bag-size. dict with those three props
 should be used as key for a dict from game state -> reward / attempts'''
 class MCTSStrategy(Strategy):
@@ -19,7 +28,7 @@ class MCTSStrategy(Strategy):
                "IJKL"
                "LMO")
 
-    def __init__(self, num_rollouts = 50, time_limit = 300, exploration_weight=1):
+    def __init__(self, num_rollouts = 5, time_limit = 300, exploration_weight=1):
         self.num_rollouts = num_rollouts
         self.time_limit = time_limit  # in seconds # TODO - how to incorporate a time limit
         self.reward_dict = defaultdict(int)
@@ -188,7 +197,6 @@ class MCTSStrategy(Strategy):
             )
         next_game_state = max(self.next_states[game_state], key=uct)
         requisite_move = self.move_between_states[(game_state, next_game_state)]
-        print('in uct select')
         self.update_board_with_move(self.board, requisite_move)  #, self.rack)
         return next_game_state
 
@@ -273,7 +281,7 @@ class MCTSStrategy(Strategy):
             #                 next_rack.remove(move.word[i - start_row])
 
             curr_bag = self.deduce_potential_bag(tupled_board, (
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))  # TODO - maybe have excluded tiles so next player cant get current players tiles
             next_rack = []
             for i in range(7):
                 if len(curr_bag) > 0:

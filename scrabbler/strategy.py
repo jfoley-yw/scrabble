@@ -4,7 +4,7 @@ class Strategy:
     Class representing a player's Strategy. The three algorithms should be a 
     subclass of this class and override the method choose move.
     '''
-    def choose_move(self, game, rack, current_score_differential):
+    def choose_move(self, game, rack, current_score_differential, is_player1_turn):
         """ method that chooses the best move"""
 
         # return the valid move with the highest score
