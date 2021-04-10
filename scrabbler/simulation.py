@@ -16,18 +16,18 @@ class Simulation:
     RACK_SIZE = 7
 
     @staticmethod
-    def simulate_game(player1, player2, first_move = None):
-        Simulation(player1, player2, first_move).simulate()
+    def simulate_game(player1, player2, start_player = None):
+        Simulation(player1, player2, start_player).simulate()
 
-    def __init__(self, player1, player2, first_move = None):
+    def __init__(self, player1, player2, start_player = None):
         # Initialize game and board
         self.game = Game()
         self.board = self.game.board
         # List of letters we can still  pick from.
         self.bag = list(Simulation.LETTERS)
         self.players = (player1, player2)
-        if first_move:
-            self.player = first_move
+        if start_player:
+            self.player = start_player
         else:   
             # randomly choose which player goes first so that it varies during each simulation
             self.player = random.randint(0,1) 
