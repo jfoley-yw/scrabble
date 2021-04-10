@@ -22,7 +22,6 @@ class Player:
             return self.end_strat.choose_move(game, self.rack)
         else:
             return self.mid_strat.choose_move(game, self.rack)
-        
 
     def is_rack_empty(self):
         return len(self.rack) == 0 
@@ -51,7 +50,4 @@ class Player:
     def get_score(self):
         """ getter for the player's score"""
         return self.score
-
-
-
     
