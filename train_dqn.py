@@ -11,8 +11,8 @@ from scrabbler.simulation import Simulation
 # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 
 # initialize global variables
-num_episodes = 5
-batch_size = 5
+num_episodes = 10
+batch_size = 1
 target_update = 1
 gamma = 0.999
 # initialize action-replay memory
@@ -22,6 +22,8 @@ policy_net = DQN(DQNHelpers.calculate_input_size(15), 100)
 target_net = DQN(DQNHelpers.calculate_input_size(15), 100)
 # initialize optimizer
 optimizer = optim.RMSprop(policy_net.parameters())
+# keep track of results
+results = []
 
 for i_episode in range(num_episodes):
     # initialize dqn strategy where eps_start = 0.9, eps_end = 0.05, and eps_decay = 200
@@ -40,9 +42,9 @@ for i_episode in range(num_episodes):
 
         # perform and record DQN agent's action
         cont = simulation.simulate_step()
-        action_taken = simulation.most_recent_move.word
-        action = DQNHelpers.get_action_vector(action_taken)
         if cont:
+            action_taken = simulation.most_recent_move.word
+            action = DQNHelpers.get_action_vector(action_taken)
             # simulate Baseline agent's action (this is part of the MDP environment)
             cont = simulation.simulate_step()
 
@@ -72,3 +74,13 @@ for i_episode in range(num_episodes):
     # update target network when necessary
     if i_episode % target_update == 0:
         target_net.load_state_dict(policy_net.state_dict())
+
+    results.append((dqn_player.get_score(), baseline_player.get_score()))
+
+# count the number of times the DQN agent won
+dqn_wins = 0
+for i in range(len(results)):
+    print('DQN score: %d; Baseline score: %d' % (results[i][0], results[i][1]))
+    if results[i][0] > results[i][1]:
+        dqn_wins += 1
+print('DQN agent won %d / %d times!' % (dqn_wins, num_episodes))

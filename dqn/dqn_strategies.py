@@ -36,6 +36,8 @@ class DQNTrainingStrategy(DQNStrategy):
             return self.policy(game, rack)
         else:
             valid_moves = game.find_valid_moves(rack)
+            if len(valid_moves) == 0:
+                return None
             return valid_moves[random.randrange(len(valid_moves))]
 
 class DQNPlayingStrategy(DQNStrategy):
