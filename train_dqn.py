@@ -11,9 +11,9 @@ from scrabbler.simulation import Simulation
 # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 
 # initialize global variables
-num_episodes = 10
-batch_size = 1
-target_update = 1
+num_episodes = 100
+batch_size = 10
+target_update = 10
 gamma = 0.999
 # initialize action-replay memory
 memory = ReplayMemory(100)
@@ -80,7 +80,9 @@ for i_episode in range(num_episodes):
 # count the number of times the DQN agent won
 dqn_wins = 0
 for i in range(len(results)):
-    print('DQN score: %d; Baseline score: %d' % (results[i][0], results[i][1]))
     if results[i][0] > results[i][1]:
+        print('DQN agent won! Score: %d to %d' % (results[i][0], results[i][1]))
         dqn_wins += 1
+    else:
+        print('DQN agent lost! Score: %d to %d' % (results[i][0], results[i][1]))
 print('DQN agent won %d / %d times!' % (dqn_wins, num_episodes))
