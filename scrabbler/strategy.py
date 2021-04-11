@@ -1,4 +1,3 @@
-
 class Strategy:
     '''
     Class representing a player's Strategy. The three algorithms should be a 
