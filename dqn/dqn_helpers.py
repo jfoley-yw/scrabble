@@ -4,6 +4,8 @@ import torch
 import torch.nn.functional as F
 from collections import namedtuple
 
+# code inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
+
 Transition = namedtuple('Transition',
                         ('state', 'action', 'next_state', 'reward', 'next_actions'))
 
@@ -42,7 +44,6 @@ class DQNHelpers:
         # 27 = 26 letters in the alphabet + 1 character for empty space
         return (board_dimension * board_dimension * 27) + 26
 
-    # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
     @staticmethod
     def optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer):
         if len(memory) < batch_size:
