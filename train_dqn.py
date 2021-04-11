@@ -11,7 +11,7 @@ from scrabbler.simulation import Simulation
 # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 
 # initialize global variables
-num_episodes = 2
+num_episodes = 5
 batch_size = 5
 target_update = 1
 gamma = 0.999

@@ -59,6 +59,7 @@ class DQNHelpers:
         state_action_batch = torch.cat((state_batch, action_batch), 1)
         state_action_values = policy_net(state_action_batch)
 
+        # calculate max[Q(s', a)] for each s' in the batch
         next_state_values = [float('-inf')] * batch_size
         for i_batch in range(batch_size):
             next_state = batch.next_state[i_batch]
@@ -73,8 +74,10 @@ class DQNHelpers:
         next_state_values = torch.tensor([next_state_values]).swapaxes(0, 1)
         expected_state_action_values = (next_state_values * gamma) + reward_batch
 
+        # compute Huber loss
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values)
 
+        # perform backpropogation / update policy network weights
         optimizer.zero_grad()
         loss.backward()
         for param in policy_net.parameters():
