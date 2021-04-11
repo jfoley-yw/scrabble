@@ -8,6 +8,8 @@ from dqn.dqn import DQN
 from scrabbler.strategy import BaselineStrategy
 from scrabbler.simulation import Simulation
 
+# inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
+
 # initialize global variables
 num_episodes = 2
 batch_size = 5

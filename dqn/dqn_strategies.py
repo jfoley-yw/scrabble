@@ -26,6 +26,7 @@ class DQNTrainingStrategy(DQNStrategy):
         self.eps_decay = eps_decay
         self.steps_done = 0
 
+    # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
     def choose_move(self, game, rack):
         sample = random.random()
         eps_threshold = self.eps_end + (self.eps_start - self.eps_end) * \
