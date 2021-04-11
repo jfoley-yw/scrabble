@@ -1,4 +1,3 @@
-
 class Strategy:
     '''
     Class representing a player's Strategy. The three algorithms should be a 
@@ -12,4 +11,7 @@ class BaselineStrategy(Strategy):
         """ method that chooses the best move"""
 
         # return the valid move with the highest score
-        return game.find_valid_moves(rack)[0]
+        valid_moves = game.find_valid_moves(rack)
+        if len(valid_moves) == 0:
+            return None
+        return valid_moves[0]
