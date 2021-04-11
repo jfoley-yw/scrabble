@@ -1,9 +1,5 @@
 from scrabbler.scrabbler import Game
-from scrabbler.player import Player
-from scrabbler.strategy import Strategy
-
 import random
-
 
 class Simulation:
     LETTERS = ("AAAAAAAAAB"
@@ -20,19 +16,22 @@ class Simulation:
     RACK_SIZE = 7
 
     @staticmethod
-    def simulate_game():
-        Simulation(Player(Strategy()), Player(Strategy())).simulate()
+    def simulate_game(player1, player2, start_player = None):
+        Simulation(player1, player2, start_player).simulate()
 
-    def __init__(self, player1, player2):
+    def __init__(self, player1, player2, start_player = None):
         # Initialize game and board
         self.game = Game()
         self.board = self.game.board
         # List of letters we can still  pick from.
         self.bag = list(Simulation.LETTERS)
-        # randomly choose which player goes first so that it varies during each simulation
-        self.player = random.randint(0,1) 
-        self.endgame = False
         self.players = (player1, player2)
+        if start_player:
+            self.player = start_player
+        else:   
+            # randomly choose which player goes first so that it varies during each simulation
+            self.player = random.randint(0,1) 
+        self.endgame = False
 
         # fills the players racks to start the game
         self.generate_rack_and_bag(0)
@@ -40,17 +39,18 @@ class Simulation:
 
     def simulate(self):
         # Keep playing until we're out of tiles or solutions.
-        while self.exectute_turn():
-            # switch whose turn it is
-            self.player = 1 - self.player
-            # Show the game board. We could have also done print(board) here.
+        while self.simulate_step():
             self.game.show()
 
         self.print_end_game_message()
 
+    def simulate_step(self):
+        done = self.exectute_turn()
+        # switch whose turn it is
+        self.player = 1 - self.player
+        return done
+
     def exectute_turn(self):
-
-
         # End of the game once either player has no letters left
         if self.players[self.player].is_rack_empty():
             return False
@@ -67,9 +67,6 @@ class Simulation:
             return True
         else:
             return False
-        
-        
-
 
     def generate_new_rack(self):
         """ Generates new rack after drawing tiles from the bag and prints out the new rack before and after the draw."""
@@ -121,4 +118,3 @@ class Simulation:
     def print_end_game_message(self):
         print("\nGAME OVER!")
         print("PLAYER 1 SCORE: %d ...... PLAYER 2 SCORE: %d" % (self.players[0].get_score(), self.players[1].get_score()))
-
