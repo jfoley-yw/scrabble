@@ -26,7 +26,7 @@ class Simulation:
         # List of letters we can still  pick from.
         self.bag = list(Simulation.LETTERS)
         self.players = (player1, player2)
-        if start_player:
+        if start_player != None:
             self.player = start_player
         else:   
             # randomly choose which player goes first so that it varies during each simulation
