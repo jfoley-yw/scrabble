@@ -19,19 +19,20 @@ class DQNStrategy(Strategy):
         return max_action
 
 class DQNTrainingStrategy(DQNStrategy):
+    STEPS_DONE = 0
+
     def __init__(self, model, eps_start, eps_end, eps_decay):
         super().__init__(model)
         self.eps_start = eps_start
         self.eps_end = eps_end
         self.eps_decay = eps_decay
-        self.steps_done = 0
 
     # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
     def choose_move(self, game, rack):
         sample = random.random()
         eps_threshold = self.eps_end + (self.eps_start - self.eps_end) * \
-            math.exp(-1. * self.steps_done / self.eps_decay)
-        self.steps_done += 1
+            math.exp(-1. * DQNTrainingStrategy.STEPS_DONE / self.eps_decay)
+        DQNTrainingStrategy.STEPS_DONE += 1
         if sample > eps_threshold:
             return self.policy(game, rack)
         else:

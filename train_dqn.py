@@ -11,9 +11,9 @@ from scrabbler.simulation import Simulation
 # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 
 # initialize global variables
-num_episodes = 100
+num_episodes = 50
 batch_size = 10
-target_update = 10
+target_update = 5
 gamma = 0.999
 # initialize action-replay memory
 memory = ReplayMemory(100)
@@ -26,8 +26,8 @@ optimizer = optim.RMSprop(policy_net.parameters())
 results = []
 
 for i_episode in range(num_episodes):
-    # initialize dqn strategy where eps_start = 0.9, eps_end = 0.05, and eps_decay = 200
-    dqn_strategy = DQNTrainingStrategy(policy_net, 0.9, 0.05, 200)
+    # initialize dqn strategy where eps_start = 0.5, eps_end = 0.05, and eps_decay = 200
+    dqn_strategy = DQNTrainingStrategy(policy_net, 0.5, 0.05, 200)
     dqn_player = DQNPlayer(dqn_strategy)
     baseline_strategy = BaselineStrategy()
     baseline_player = DQNPlayer(baseline_strategy)
