@@ -26,7 +26,7 @@ class Simulation:
         # List of letters we can still  pick from.
         self.bag = list(Simulation.LETTERS)
         self.players = (player1, player2)
-        if start_player:
+        if start_player != None:
             self.player = start_player
         else:   
             # randomly choose which player goes first so that it varies during each simulation
@@ -36,6 +36,8 @@ class Simulation:
         # fills the players racks to start the game
         self.generate_rack_and_bag(0)
         self.generate_rack_and_bag(1)
+
+        self.most_recent_move = None # needed for dqn
 
     def simulate(self):
         # Keep playing until we're out of tiles or solutions.
@@ -59,6 +61,8 @@ class Simulation:
         print("Bag: %s" % "".join(self.bag))
         print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
         best_move = self.players[self.player].choose_move(self.endgame, self.game)
+
+        self.most_recent_move = best_move # needed for dqn
 
         # If a valid move exists, then make best move, otherwise end game
         if best_move:
