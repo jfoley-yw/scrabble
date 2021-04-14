@@ -52,13 +52,19 @@ class Simulation:
 
     def exectute_turn(self):
         # End of the game once either player has no letters left
-        if self.players[self.player].is_rack_empty():
+        if self.players[0].is_rack_empty() or self.players[1].is_rack_empty():
             return False
 
         print("########################## Player %d turn ############################"%(self.player + 1))
         print("Bag: %s" % "".join(self.bag))
         print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
-        best_move = self.players[self.player].choose_move(self.endgame, self.game)
+
+        if self.player == 0:
+            other_player = 1
+        else:
+            other_player = 0
+
+        best_move = self.players[self.player].choose_move(self.endgame, self.game, self.players[other_player].get_score(), self.players[other_player].get_rack(), self.game.dictionary)
 
         # If a valid move exists, then make best move, otherwise end game
         if best_move:
@@ -77,8 +83,7 @@ class Simulation:
         """Randomly chooses tiles from bag and places in rack"""
         new_letters = []
         for i in range(Simulation.RACK_SIZE - len(self.players[player].get_rack())):
-            # If bag has ended then end game begins (as of right now this 
-            # doesn't formally mean anything, just print statement)
+            # If bag has ended then end game begins 
             if not self.bag:
                 if not self.endgame:
                     print('|||||||||||||||||||| END GAME STARTS NOW ||||||||||||||||||||')

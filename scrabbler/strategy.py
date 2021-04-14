@@ -3,11 +3,11 @@ class Strategy:
     Class representing a player's Strategy. The three algorithms should be a 
     subclass of this class and override the method choose move.
     '''
-    def choose_move(self, game, rack):
+    def choose_move(self, game, rack, score_diff, opponents_rack, dictionary):
         raise Exception('Method not defined!')
 
 class BaselineStrategy(Strategy):
-    def choose_move(self, game, rack):
+    def choose_move(self, game, rack, score_diff, opponents_rack, dictionary):
         """ method that chooses the best move"""
 
         # return the valid move with the highest score
@@ -15,3 +15,5 @@ class BaselineStrategy(Strategy):
         if len(valid_moves) == 0:
             return None
         return valid_moves[0]
+
+        
