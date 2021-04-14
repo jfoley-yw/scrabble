@@ -4,8 +4,6 @@ import copy
 import math
 from collections import defaultdict
 
-
-
 class ABStrategy(Strategy):
     def __init__(self):
         self.dictionary = None
@@ -20,6 +18,7 @@ class ABStrategy(Strategy):
         
     def minimax(self, cur_state, max_depth, is_player_minimizer, alpha, beta):
         best_move = None
+        first_move = None
         print("CURRENT DEPTH", max_depth)
 
         if max_depth == 0 or cur_state.is_end_state():
@@ -77,11 +76,12 @@ class ABStrategy(Strategy):
                 print("next score diff maximizer", next_score_diff)
                 # update the moves to get to the gamestate
                 moves_to_get_here = cur_state.update_moves(move)
-
                 # create the next state
                 next_state = ABGamestate(next_board, next_rack, cur_state.opponent_rack, is_player_minimizer=True, score_diff=next_score_diff, moves=moves_to_get_here)
+                
                 evaluation, moves_to_here = self.minimax(next_state, max_depth - 1, True, alpha, beta)
                 print("Depth after eval max", max_depth)
+
                 value = max(value, evaluation)
                 if max(value, evaluation) is evaluation:
                     value = evaluation 

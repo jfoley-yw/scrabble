@@ -17,7 +17,7 @@ class Simulation:
 
     @staticmethod
     def simulate_game(player1, player2, start_player = None):
-        Simulation(player1, player2, start_player).simulate()
+        return Simulation(player1, player2, start_player).simulate()
 
     def __init__(self, player1, player2, start_player = None):
         # Initialize game and board
@@ -43,6 +43,12 @@ class Simulation:
             self.game.show()
 
         self.print_end_game_message()
+       
+        p1_score = self.players[1].get_score()
+        p0_score = self.players[0].get_score()
+        print(p1_score)
+        print(p0_score)
+        return p0_score, p1_score
 
     def simulate_step(self):
         done = self.exectute_turn()
