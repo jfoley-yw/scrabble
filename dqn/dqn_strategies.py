@@ -1,5 +1,6 @@
 import random
 import math
+import torch
 from dqn.dqn_helpers import DQNHelpers
 from scrabbler.strategy import Strategy
 
@@ -12,7 +13,8 @@ class DQNStrategy(Strategy):
         max_q_value = float('-inf')
         max_action = None
         for move in valid_moves:
-            q_value = self.model(DQNHelpers.get_input_vector(game, move.word)).item()
+            with torch.no_grad():
+                q_value = self.model(DQNHelpers.get_input_vector(game, move.word)).item()
             if q_value > max_q_value:
                 max_q_value = q_value
                 max_action = move
