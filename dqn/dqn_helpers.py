@@ -84,6 +84,8 @@ class DQNHelpers:
             param.grad.data.clamp_(-1, 1)
         optimizer.step()
 
+        return loss.item()
+
 class ReplayMemory:
     def __init__(self, capacity):
         self.capacity = capacity

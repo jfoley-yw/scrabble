@@ -1,5 +1,6 @@
 import torch
 import torch.optim as optim
+import matplotlib.pyplot as plt
 from dqn.dqn_player import DQNPlayer
 from dqn.dqn_strategies import DQNTrainingStrategy
 from dqn.dqn_helpers import DQNHelpers
@@ -21,9 +22,13 @@ memory = ReplayMemory(2000)
 policy_net = DQN(DQNHelpers.calculate_input_size(15), 200)
 target_net = DQN(DQNHelpers.calculate_input_size(15), 200)
 # initialize optimizer
-optimizer = optim.RMSprop(policy_net.parameters())
+optimizer = optim.RMSprop(policy_net.parameters(), lr = 0.0001)
 # keep track of results
 results = []
+# keep track of losses
+losses = []
+# keep track of total steps taken
+total_steps = 0
 
 for i_episode in range(num_episodes):
     # initialize dqn strategy where eps_start = 0.9, eps_end = 0.05, and eps_decay = 200
@@ -42,6 +47,7 @@ for i_episode in range(num_episodes):
 
         # perform and record DQN agent's action
         cont = simulation.simulate_step()
+        action = None
         if cont:
             action_taken = simulation.most_recent_move.word
             action = DQNHelpers.get_action_vector(action_taken)
@@ -68,7 +74,8 @@ for i_episode in range(num_episodes):
        # save MDP transition in action-replay memory
         memory.push(state, action, next_state, reward, next_actions)
 
-        DQNHelpers.optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer)
+        loss = DQNHelpers.optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer)
+        losses.append(loss)
         step += 1
 
     # update target network when necessary
@@ -77,14 +84,21 @@ for i_episode in range(num_episodes):
 
     results.append((dqn_player.get_score(), baseline_player.get_score()))
 
+    total_steps += step
+
     print("EPISODE %d COMPLETED!" % (i_episode))
 
-# count the number of times the DQN agent won
-dqn_wins = 0
-for i in range(len(results)):
-    if results[i][0] > results[i][1]:
-        print('DQN agent won! Score: %d to %d' % (results[i][0], results[i][1]))
-        dqn_wins += 1
-    else:
-        print('DQN agent lost! Score: %d to %d' % (results[i][0], results[i][1]))
-print('DQN agent won %d / %d times!' % (dqn_wins, num_episodes))
+# construct iterations vs. scores plot and iterations vs. losses plot
+dqn_scores = [result[0] for result in results]
+baseline_scores = [result[1] for result in results]
+steps = [i for i in range(total_steps)]
+episodes = [i for i in range(num_episodes)]
+
+plt.figure()
+
+plt.subplot(211)
+plt.plot(episodes, dqn_scores, episodes, baseline_scores)
+
+plt.subplot(212)
+plt.plot(steps, losses)
+plt.savefig('dqn_plots.png')
