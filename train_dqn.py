@@ -11,23 +11,23 @@ from scrabbler.simulation import Simulation
 # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 
 # initialize global variables
-num_episodes = 50
-batch_size = 10
-target_update = 5
+num_episodes = 200
+batch_size = 32
+target_update = 20
 gamma = 0.999
 # initialize action-replay memory
-memory = ReplayMemory(100)
+memory = ReplayMemory(2000)
 # initialize DQNs
-policy_net = DQN(DQNHelpers.calculate_input_size(15), 100)
-target_net = DQN(DQNHelpers.calculate_input_size(15), 100)
+policy_net = DQN(DQNHelpers.calculate_input_size(15), 200)
+target_net = DQN(DQNHelpers.calculate_input_size(15), 200)
 # initialize optimizer
 optimizer = optim.RMSprop(policy_net.parameters())
 # keep track of results
 results = []
 
 for i_episode in range(num_episodes):
-    # initialize dqn strategy where eps_start = 0.5, eps_end = 0.05, and eps_decay = 200
-    dqn_strategy = DQNTrainingStrategy(policy_net, 0.5, 0.05, 200)
+    # initialize dqn strategy where eps_start = 0.9, eps_end = 0.05, and eps_decay = 200
+    dqn_strategy = DQNTrainingStrategy(policy_net, 0.9, 0.05, 200)
     dqn_player = DQNPlayer(dqn_strategy)
     baseline_strategy = BaselineStrategy()
     baseline_player = DQNPlayer(baseline_strategy)
@@ -76,6 +76,8 @@ for i_episode in range(num_episodes):
         target_net.load_state_dict(policy_net.state_dict())
 
     results.append((dqn_player.get_score(), baseline_player.get_score()))
+
+    print("EPISODE %d COMPLETED!" % (i_episode))
 
 # count the number of times the DQN agent won
 dqn_wins = 0
