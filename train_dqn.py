@@ -14,10 +14,10 @@ from scrabbler.simulation import Simulation
 # initialize global variables
 num_episodes = 200
 batch_size = 32
-target_update = 20
+target_update = 100
 gamma = 0.999
 # initialize action-replay memory
-memory = ReplayMemory(2000)
+memory = ReplayMemory(360)
 # initialize DQNs
 policy_net = DQN(DQNHelpers.calculate_input_size(15), 200)
 target_net = DQN(DQNHelpers.calculate_input_size(15), 200)
@@ -31,8 +31,8 @@ losses = []
 total_steps = 0
 
 for i_episode in range(num_episodes):
-    # initialize dqn strategy where eps_start = 0.9, eps_end = 0.05, and eps_decay = 200
-    dqn_strategy = DQNTrainingStrategy(policy_net, 0.9, 0.05, 200)
+    # initialize dqn strategy where eps_start = 1.0, eps_end = 0.1, and eps_decay = 800
+    dqn_strategy = DQNTrainingStrategy(policy_net, 1.0, 0.1, 800)
     dqn_player = DQNPlayer(dqn_strategy)
     baseline_strategy = BaselineStrategy()
     baseline_player = DQNPlayer(baseline_strategy)
@@ -77,22 +77,22 @@ for i_episode in range(num_episodes):
         loss = DQNHelpers.optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer)
         losses.append(loss)
         step += 1
+        total_steps += 1
 
-    # update target network when necessary
-    if i_episode % target_update == 0:
-        target_net.load_state_dict(policy_net.state_dict())
+        # update target network when necessary
+        if total_steps % target_update == 0:
+            target_net.load_state_dict(policy_net.state_dict())
 
     results.append((dqn_player.get_score(), baseline_player.get_score()))
-
-    total_steps += step
 
     print("EPISODE %d COMPLETED!" % (i_episode))
 
 # construct iterations vs. scores plot and iterations vs. losses plot
 dqn_scores = [result[0] for result in results]
 baseline_scores = [result[1] for result in results]
-steps = [i for i in range(total_steps)]
 episodes = [i for i in range(num_episodes)]
+steps = [i for i in range(0, total_steps, 10)]
+losses = [losses[i] for i in range(0, total_steps, 10)]
 
 plt.figure()
 
