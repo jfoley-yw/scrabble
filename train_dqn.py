@@ -12,12 +12,12 @@ from scrabbler.simulation import Simulation
 # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 
 # initialize global variables
-num_episodes = 200
+num_episodes = 50
 batch_size = 32
-target_update = 100
+target_update = 25
 gamma = 0.999
 # initialize action-replay memory
-memory = ReplayMemory(360)
+memory = ReplayMemory(90)
 # initialize DQNs
 policy_net = DQN(DQNHelpers.calculate_input_size(15), 200)
 target_net = DQN(DQNHelpers.calculate_input_size(15), 200)
@@ -31,8 +31,8 @@ losses = []
 total_steps = 0
 
 for i_episode in range(num_episodes):
-    # initialize dqn strategy where eps_start = 1.0, eps_end = 0.1, and eps_decay = 800
-    dqn_strategy = DQNTrainingStrategy(policy_net, 1.0, 0.1, 800)
+    # initialize dqn strategy where eps_start = 1.0, eps_end = 0.1, and eps_decay = 200
+    dqn_strategy = DQNTrainingStrategy(policy_net, 1.0, 0.1, 200)
     dqn_player = DQNPlayer(dqn_strategy)
     baseline_strategy = BaselineStrategy()
     baseline_player = DQNPlayer(baseline_strategy)
@@ -47,12 +47,13 @@ for i_episode in range(num_episodes):
 
         # perform and record DQN agent's action
         cont = simulation.simulate_step()
-        action = None
         if cont:
             action_taken = simulation.most_recent_move.word
             action = DQNHelpers.get_action_vector(action_taken)
             # simulate Baseline agent's action (this is part of the MDP environment)
             cont = simulation.simulate_step()
+        else:
+            action = DQNHelpers.get_empty_action_vector()
 
         # calculate MDP reward
         new_score_diff = dqn_player.get_score() - baseline_player.get_score()

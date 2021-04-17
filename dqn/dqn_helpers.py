@@ -35,6 +35,11 @@ class DQNHelpers:
         return torch.tensor([action], dtype = torch.float)
 
     @staticmethod
+    def get_empty_action_vector():
+        action = [0] * 26
+        return torch.tensor([action], dtype = torch.float)
+
+    @staticmethod
     def get_input_vector(game, word):
         return torch.cat((DQNHelpers.get_state_vector(game), DQNHelpers.get_action_vector(word)), 1)
 
