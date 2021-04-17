@@ -73,9 +73,9 @@ class DQNHelpers:
                 next_state_values[i_batch] = 0
                 continue
             next_actions = batch.next_actions[i_batch]
-            for next_action in next_actions:
-                input_vector = torch.cat((next_state, next_action), 1)
-                next_state_values[i_batch] = max(next_state_values[i_batch], target_net(input_vector).item())
+            next_state_actions = [torch.cat((next_state, next_action), 1) for next_action in next_actions]
+            next_state_actions_tensor = torch.cat(next_state_actions, 0)
+            next_state_values[i_batch] = target_net(next_state_actions_tensor).max().item()
 
         next_state_values = torch.tensor([next_state_values]).swapaxes(0, 1)
         expected_state_action_values = (next_state_values * gamma) + reward_batch
