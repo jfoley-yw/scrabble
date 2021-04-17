@@ -1,6 +1,7 @@
 import torch
 import torch.optim as optim
 import matplotlib.pyplot as plt
+from dqn.dqn_constants import DQNConstants
 from dqn.dqn_player import DQNPlayer
 from dqn.dqn_strategies import DQNTrainingStrategy
 from dqn.dqn_helpers import DQNHelpers
@@ -12,17 +13,17 @@ from scrabbler.simulation import Simulation
 # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 
 # initialize global variables
-num_episodes = 50
-batch_size = 32
-target_update = 25
-gamma = 0.999
+num_episodes = DQNConstants.EPISODES
+batch_size = DQNConstants.BATCH_SIZE
+target_update = DQNConstants.TARGET_UPDATE
+gamma = DQNConstants.GAMMA
 # initialize action-replay memory
-memory = ReplayMemory(90)
+memory = ReplayMemory(DQNConstants.REPLAY_MEMORY_SIZE)
 # initialize DQNs
-policy_net = DQN(DQNHelpers.calculate_input_size(15), 200)
-target_net = DQN(DQNHelpers.calculate_input_size(15), 200)
+policy_net = DQN(DQNHelpers.calculate_input_size(15), DQNConstants.HIDDEN_LAYER_SIZE)
+target_net = DQN(DQNHelpers.calculate_input_size(15), DQNConstants.HIDDEN_LAYER_SIZE)
 # initialize optimizer
-optimizer = optim.RMSprop(policy_net.parameters(), lr = 0.0001)
+optimizer = optim.RMSprop(policy_net.parameters(), lr = DQNConstants.LEARNING_RATE)
 # keep track of results
 results = []
 # keep track of losses
@@ -31,8 +32,8 @@ losses = []
 total_steps = 0
 
 for i_episode in range(num_episodes):
-    # initialize dqn strategy where eps_start = 1.0, eps_end = 0.1, and eps_decay = 200
-    dqn_strategy = DQNTrainingStrategy(policy_net, 1.0, 0.1, 200)
+    # initialize dqn strategy
+    dqn_strategy = DQNTrainingStrategy(policy_net, DQNConstants.EPSILON_START, DQNConstants.EPSILON_END, DQNConstants.EPSILON_DECAY)
     dqn_player = DQNPlayer(dqn_strategy)
     baseline_strategy = BaselineStrategy()
     baseline_player = DQNPlayer(baseline_strategy)
