@@ -1,3 +1,5 @@
+import copy
+
 class Player:
     '''
     Player Class represents a player in scrabble that takes in a midgame strategy and an optional endgame strategy. 
@@ -15,13 +17,16 @@ class Player:
         self.rack = []
 
         self.name = name # might be useful for plotting during analysis
+        self.endgame_score = None
 
-    def choose_move(self, is_endgame, game):
+    def choose_move(self, is_endgame, game, other_score, other_rack, dictionary):
         # chooses a move for the player based on the endgame and midgame strategies
+        score_diff = self.score - other_score
         if is_endgame:
-            return self.end_strat.choose_move(game, self.rack)
+            print("END GAME STRATEGY ACITVATED")
+            return self.end_strat.choose_move(game, self.rack, score_diff, other_rack, dictionary)
         else:
-            return self.mid_strat.choose_move(game, self.rack)
+            return self.mid_strat.choose_move(game, self.rack, score_diff, other_rack, dictionary)
 
     def is_rack_empty(self):
         return len(self.rack) == 0 
@@ -50,3 +55,6 @@ class Player:
     def get_score(self):
         """ getter for the player's score"""
         return self.score
+
+    def set_endgame_score(self):
+        self.endgame_score = copy.deepcopy(self.get_score())
