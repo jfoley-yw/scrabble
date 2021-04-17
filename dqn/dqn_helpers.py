@@ -28,15 +28,16 @@ class DQNHelpers:
 
     @staticmethod
     def get_action_vector(word):
-        action = [0] * 26
+        action = [0] * (26 * 15)
         for i in range(len(word)):
+            offset = i * 26
             position = string.ascii_lowercase.index(word[i].lower())
-            action[position] += 1
+            action[offset + position] = 1
         return torch.tensor([action], dtype = torch.float)
 
     @staticmethod
     def get_empty_action_vector():
-        action = [0] * 26
+        action = [0] * (26 * 15)
         return torch.tensor([action], dtype = torch.float)
 
     @staticmethod
