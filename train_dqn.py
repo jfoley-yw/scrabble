@@ -1,5 +1,4 @@
 import torch
-import torch.optim as optim
 import matplotlib.pyplot as plt
 from dqn.dqn_constants import DQNConstants
 from dqn.dqn_player import DQNPlayer
@@ -23,7 +22,7 @@ memory = ReplayMemory(DQNConstants.REPLAY_MEMORY_SIZE)
 policy_net = DQN(DQNHelpers.calculate_input_size(15), DQNConstants.HIDDEN_LAYER_SIZE)
 target_net = DQN(DQNHelpers.calculate_input_size(15), DQNConstants.HIDDEN_LAYER_SIZE)
 # initialize optimizer
-optimizer = optim.RMSprop(policy_net.parameters(), lr = DQNConstants.LEARNING_RATE)
+optimizer = DQNConstants.OPTIMIZER(policy_net.parameters(), lr = DQNConstants.LEARNING_RATE)
 # keep track of results
 results = []
 # keep track of losses

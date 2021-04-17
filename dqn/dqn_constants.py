@@ -1,3 +1,5 @@
+import torch.optim as optim
+
 class DQNConstants:
     EPISODES = 50
     BATCH_SIZE = 32
@@ -9,3 +11,4 @@ class DQNConstants:
     EPSILON_START = 1.0
     EPSILON_END = 0.1
     EPSILON_DECAY = 200
+    OPTIMIZER = optim.RMSprop
