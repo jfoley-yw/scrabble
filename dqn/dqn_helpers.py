@@ -48,7 +48,7 @@ class DQNHelpers:
     def calculate_input_size(board_dimension):
         # one vector of length 27 per cell on the board + encoding of action
         # 27 = 26 letters in the alphabet + 1 character for empty space
-        return (board_dimension * board_dimension * 27) + 26
+        return (board_dimension * board_dimension * 27) + (26 * 15)
 
     @staticmethod
     def optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer):
