@@ -1,8 +1,6 @@
 from collections import defaultdict
 import copy
 
-
-
 class ABGamestate:
     def __init__(self, board, player_rack, opponent_rack, is_player_minimizer, score_diff, moves):
         self.board = board
@@ -25,7 +23,7 @@ class ABGamestate:
         moves = across_moves + down_moves
         # sort so most likely to find best moves first
         moves.sort(key=lambda move_: move_.score, reverse=True)
-        return moves[:5]
+        return moves[:20]
 
 
     def is_end_state(self):

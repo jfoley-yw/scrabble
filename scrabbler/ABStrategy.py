@@ -12,7 +12,7 @@ class ABStrategy(Strategy):
         self.dictionary = dictionary
         board = copy.deepcopy(game.board)
         gamestate = ABGamestate(board, rack, opponent_rack, 0, score_diff, [])
-        value, move = self.minimax(gamestate, 14, False, -math.inf, math.inf)
+        value, move = self.minimax(gamestate, 4, False, -math.inf, math.inf)
         print("move", move)
         return move
         

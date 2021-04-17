@@ -1,5 +1,6 @@
 from scrabbler.scrabbler import Game
 import random
+import copy
 
 class Simulation:
     LETTERS = ("AAAAAAAAAB"
@@ -46,8 +47,6 @@ class Simulation:
        
         p1_score = self.players[1].get_score()
         p0_score = self.players[0].get_score()
-        print(p1_score)
-        print(p0_score)
         return p0_score, p1_score
 
     def simulate_step(self):
@@ -94,6 +93,8 @@ class Simulation:
                 if not self.endgame:
                     print('|||||||||||||||||||| END GAME STARTS NOW ||||||||||||||||||||')
                     self.endgame = True
+                    self.players[0].set_endgame_score()
+                    self.players[1].set_endgame_score()
                 break
 
             new_tile = random.choice(self.bag)
