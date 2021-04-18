@@ -10,15 +10,13 @@ class DQNStrategy(Strategy):
 
     def policy(self, game, rack):
         valid_moves = game.find_valid_moves(rack)
-        max_q_value = float('-inf')
-        max_action = None
-        for move in valid_moves:
-            with torch.no_grad():
-                q_value = self.model(DQNHelpers.get_input_vector(game, move.word)).item()
-            if q_value > max_q_value:
-                max_q_value = q_value
-                max_action = move
-        return max_action
+        if len(valid_moves) == 0:
+            return None
+        input_vectors = [DQNHelpers.get_input_vector(game, move.word) for move in valid_moves]
+        with torch.no_grad():
+            q_values = self.model(torch.cat(input_vectors, 0))
+        max_action_index = q_values.max(0).indices.item()
+        return valid_moves[max_action_index]
 
 class DQNTrainingStrategy(DQNStrategy):
     STEPS_DONE = 0
