@@ -1,7 +1,7 @@
 import torch.optim as optim
 
 class DQNConstants:
-    EPISODES = 1
+    EPISODES = 1500
     BATCH_SIZE = 32
     TARGET_UPDATE = 500
     GAMMA = 0.99
