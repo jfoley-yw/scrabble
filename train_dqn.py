@@ -95,6 +95,10 @@ for i_episode in range(num_episodes):
 
     print("EPISODE %d COMPLETED!" % (i_episode))
 
+# save policy net parameters to a file
+torch.save(policy_net.state_dict(), './dqn/policy_net_final.pt')
+
+# aggregate data for plotting
 dqn_scores = [result[0] for result in results]
 baseline_scores = [result[1] for result in results]
 episodes = [i for i in range(num_episodes)]
