@@ -96,7 +96,7 @@ for i_episode in range(num_episodes):
     print("EPISODE %d COMPLETED!" % (i_episode))
 
 # save policy net parameters to a file
-torch.save(policy_net.state_dict(), './dqn/policy_net_final.pt')
+torch.save(policy_net.state_dict(), './dqn/models/policy_net_final.pt')
 
 # aggregate data for plotting
 dqn_scores = [result[0] for result in results]
@@ -111,4 +111,4 @@ _, axis = plt.subplots(2, 2)
 axis[0, 0].plot(episodes, dqn_scores, episodes, baseline_scores)
 axis[0, 1].plot(steps, losses)
 axis[1,0].plot(steps, rewards)
-plt.savefig('dqn_plots.png')
+plt.savefig('./dqn/plots/dqn_plots.png')
