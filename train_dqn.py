@@ -27,6 +27,8 @@ optimizer = DQNConstants.OPTIMIZER(policy_net.parameters(), lr = DQNConstants.LE
 results = []
 # keep track of losses
 losses = []
+# keep track of rewards
+rewards = []
 # keep track of total steps taken
 total_steps = 0
 
@@ -57,11 +59,12 @@ for i_episode in range(num_episodes):
 
         # calculate MDP reward
         new_score_diff = dqn_player.get_score() - baseline_player.get_score()
-        if step >= 2:
+        if step >= 1:
             old_score_diff = dqn_player.get_old_score() - baseline_player.get_old_score()
         else:
             old_score_diff = 0
         reward = torch.tensor([[new_score_diff - old_score_diff]], dtype = torch.float)
+        rewards.append(reward)
 
         # calculate MDP next state and next actions
         next_actions = []
@@ -70,6 +73,10 @@ for i_episode in range(num_episodes):
             for move in simulation.game.find_valid_moves(dqn_player.get_rack()):
                 next_actions.append(DQNHelpers.get_action_vector(move.word))
         else:
+            next_state = None
+
+        # check if the next state is a terminal state
+        if len(next_actions) == 0:
             next_state = None
 
        # save MDP transition in action-replay memory
@@ -88,18 +95,16 @@ for i_episode in range(num_episodes):
 
     print("EPISODE %d COMPLETED!" % (i_episode))
 
-# construct iterations vs. scores plot and iterations vs. losses plot
 dqn_scores = [result[0] for result in results]
 baseline_scores = [result[1] for result in results]
 episodes = [i for i in range(num_episodes)]
 steps = [i for i in range(0, total_steps, 10)]
 losses = [losses[i] for i in range(0, total_steps, 10)]
+rewards = [rewards[i] for i in range(0, total_steps, 10)]
 
-plt.figure()
-
-plt.subplot(211)
-plt.plot(episodes, dqn_scores, episodes, baseline_scores)
-
-plt.subplot(212)
-plt.plot(steps, losses)
+# construct episodes vs. scores plot, iterations vs. losses plot, iterations vs. rewards plot
+_, axis = plt.subplots(2, 2)
+axis[0, 0].plot(episodes, dqn_scores, episodes, baseline_scores)
+axis[0, 1].plot(steps, losses)
+axis[1,0].plot(steps, rewards)
 plt.savefig('dqn_plots.png')
