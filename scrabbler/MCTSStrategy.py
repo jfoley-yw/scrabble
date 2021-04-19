@@ -18,16 +18,20 @@ class MCTSStrategy(Strategy):
     #            "OOOOOOOPPQ"
     #            "RRRRRRSSSS"
     #            "TTTTTTUUUU"
-    #            "VVWWXYYZ")  # TODO - deleted the question marks to remove issue of deducing bag
+    #            "VVWWXYYZ??")
 
-    LETTERS = ("AAAB"
+    LETTERS = ("AAAAAB"
+               "BCDEEE"
                "EEE"
-               "EE"
-               "FII"
-               "IJKL"
-               "LMO")
+               "FGGHIIII"
+               "IIJKL"
+               "LMNNO"
+               "OOOPQ"
+               "RRSS"
+               "TTUU"
+               "VWXYZ")
 
-    RACK_SIZE = 3
+    RACK_SIZE = 7
 
     def __init__(self, num_rollouts = 3, time_limit = 300, exploration_weight=1):
         self.num_rollouts = num_rollouts

@@ -12,16 +12,20 @@ class Simulation:
     #            "OOOOOOOPPQ"
     #            "RRRRRRSSSS"
     #            "TTTTTTUUUU"
-    #            "VVWWXYYZ")  # TODO - deleted the question marks to remove issue of deducing bag
+    #            "VVWWXYYZ??")
 
-    LETTERS = ("AAAB"
+    LETTERS = ("AAAAAB"
+               "BCDEEE"
                "EEE"
-               "EE"
-               "FII"
-               "IJKL"
-               "LMO")
+               "FGGHIIII"
+               "IIJKL"
+               "LMNNO"
+               "OOOPQ"
+               "RRSS"
+               "TTUU"
+               "VWXYZ")
     
-    RACK_SIZE = 4
+    RACK_SIZE = 7
 
     @staticmethod
     def simulate_game(player1, player2, start_player = None):
