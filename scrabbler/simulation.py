@@ -3,18 +3,25 @@ import random
 import copy
 
 class Simulation:
-    LETTERS = ("AAAAAAAAAB"
-               "BCCDDDDEEE"
-               "EEEEEEEEEF"
-               "FGGGHHIIII"
-               "IIIIIJKLLL"
-               "LMMNNNNNNO"
-               "OOOOOOOPPQ"
-               "RRRRRRSSSS"
-               "TTTTTTUUUU"
-               "VVWWXYYZ??")
+    # LETTERS = ("AAAAAAAAAB"
+    #            "BCCDDDDEEE"
+    #            "EEEEEEEEEF"
+    #            "FGGGHHIIII"
+    #            "IIIIIJKLLL"
+    #            "LMMNNNNNNO"
+    #            "OOOOOOOPPQ"
+    #            "RRRRRRSSSS"
+    #            "TTTTTTUUUU"
+    #            "VVWWXYYZ")  # TODO - deleted the question marks to remove issue of deducing bag
+
+    LETTERS = ("AAAB"
+               "EEE"
+               "EE"
+               "FII"
+               "IJKL"
+               "LMO")
     
-    RACK_SIZE = 7
+    RACK_SIZE = 4
 
     @staticmethod
     def simulate_game(player1, player2, start_player = None):
@@ -31,7 +38,8 @@ class Simulation:
             self.player = start_player
         else:   
             # randomly choose which player goes first so that it varies during each simulation
-            self.player = random.randint(0,1) 
+            # self.player = random.randint(0,1)  # ANDREW - TODO
+            self.player = 0
         self.endgame = False
 
         # fills the players racks to start the game
