@@ -1,13 +1,10 @@
 import torch
 import matplotlib.pyplot as plt
 from dqn.dqn_constants import DQNConstants
-from dqn.dqn_player import DQNPlayer
-from dqn.dqn_strategies import DQNTrainingStrategy
-from dqn.dqn_helpers import DQNHelpers
-from dqn.dqn_helpers import ReplayMemory
+from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
+from dqn.dqn_scrabble_helpers import ReplayMemory
 from dqn.dqn import DQN
-from scrabbler.strategy import BaselineStrategy
-from scrabbler.simulation import Simulation
+from dqn.dqn_scrabble_environment import DQNScrabbleEnvironment
 
 # inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 
@@ -16,11 +13,14 @@ num_episodes = DQNConstants.EPISODES
 batch_size = DQNConstants.BATCH_SIZE
 target_update = DQNConstants.TARGET_UPDATE
 gamma = DQNConstants.GAMMA
+epsilon_start = DQNConstants.EPSILON_START
+epsilon_end = DQNConstants.EPSILON_END
+epsilon_decay = DQNConstants.EPSILON_DECAY
 # initialize action-replay memory
 memory = ReplayMemory(DQNConstants.REPLAY_MEMORY_SIZE)
 # initialize DQNs
-policy_net = DQN(DQNHelpers.calculate_input_size(11), DQNConstants.HIDDEN_LAYER_SIZE)
-target_net = DQN(DQNHelpers.calculate_input_size(11), DQNConstants.HIDDEN_LAYER_SIZE)
+policy_net = DQN(DQNHelpers.calculate_input_size(5), DQNConstants.HIDDEN_LAYER_SIZE)
+target_net = DQN(DQNHelpers.calculate_input_size(5), DQNConstants.HIDDEN_LAYER_SIZE)
 # initialize optimizer
 optimizer = DQNConstants.OPTIMIZER(policy_net.parameters(), lr = DQNConstants.LEARNING_RATE)
 # keep track of results
@@ -31,67 +31,38 @@ losses = []
 rewards = []
 # keep track of total steps taken
 total_steps = 0
+# initialize environment
+env = DQNScrabbleEnvironment()
 
 for i_episode in range(num_episodes):
-    # initialize dqn strategy
-    dqn_strategy = DQNTrainingStrategy(policy_net, DQNConstants.EPSILON_START, DQNConstants.EPSILON_END, DQNConstants.EPSILON_DECAY)
-    dqn_player = DQNPlayer(dqn_strategy)
-    baseline_strategy = BaselineStrategy()
-    baseline_player = DQNPlayer(baseline_strategy)
-    simulation = Simulation(dqn_player, baseline_player, 0)
-    step = 0
-    cont = True
+    observation, done = env.reset()
 
     # start the episode
-    while cont:
-        # calculate MDP state
-        state = DQNHelpers.get_state_vector(simulation.game)
+    while not done:
+        state = observation.state
+        action = DQNScrabbleHelpers.select_training_action(observation, epsilon_start, epsilon_end, epsilon_decay, total_steps, policy_net)
 
-        # perform and record DQN agent's action
-        cont = simulation.simulate_step()
-        if cont:
-            action_taken = simulation.most_recent_move.word
-            action = DQNHelpers.get_action_vector(action_taken)
-            # simulate Baseline agent's action (this is part of the MDP environment)
-            cont = simulation.simulate_step()
-        else:
-            action = DQNHelpers.get_empty_action_vector()
+        observation, reward, done, _ = env.step(action)
+        rewards.append(torch.tensor([[reward]], dtype = torch.float))
 
-        # calculate MDP reward
-        new_score_diff = dqn_player.get_score() - baseline_player.get_score()
-        if step >= 1:
-            old_score_diff = dqn_player.get_old_score() - baseline_player.get_old_score()
-        else:
-            old_score_diff = 0
-        reward = torch.tensor([[new_score_diff - old_score_diff]], dtype = torch.float)
-        rewards.append(reward)
-
-        # calculate MDP next state and next actions
-        next_actions = []
-        if cont:
-            next_state = DQNHelpers.get_state_vector(simulation.game)
-            for move in simulation.game.find_valid_moves(dqn_player.get_rack()):
-                next_actions.append(DQNHelpers.get_action_vector(move.word))
-        else:
+        if done:
             next_state = None
+        else:
+            next_state = DQNScrabbleHelpers.get_state_vector(observation.state)
 
-        # check if the next state is a terminal state
-        if len(next_actions) == 0:
-            next_state = None
-
-       # save MDP transition in action-replay memory
-        memory.push(state, action, next_state, reward, next_actions)
+        # save MDP transition in action-replay memory
+        memory.push(state, action, next_state, reward)
 
         loss = DQNHelpers.optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer)
         losses.append(loss)
-        step += 1
+
         total_steps += 1
 
         # update target network when necessary
         if total_steps % target_update == 0:
             target_net.load_state_dict(policy_net.state_dict())
 
-    results.append((dqn_player.get_score(), baseline_player.get_score()))
+    results.append(env.get_final_score())
 
     print("EPISODE %d COMPLETED!" % (i_episode))
 
@@ -99,8 +70,6 @@ for i_episode in range(num_episodes):
 torch.save(policy_net.state_dict(), './dqn/models/policy_net_final.pt')
 
 # aggregate data for plotting
-dqn_scores = [result[0] for result in results]
-baseline_scores = [result[1] for result in results]
 episodes = [i for i in range(num_episodes)]
 steps = [i for i in range(0, total_steps, 10)]
 losses = [losses[i] for i in range(0, total_steps, 10)]
@@ -108,7 +77,7 @@ rewards = [rewards[i] for i in range(0, total_steps, 10)]
 
 # construct episodes vs. scores plot, iterations vs. losses plot, iterations vs. rewards plot
 _, axis = plt.subplots(2, 2)
-axis[0, 0].plot(episodes, dqn_scores, episodes, baseline_scores)
+axis[0, 0].plot(episodes, results)
 axis[0, 1].plot(steps, losses)
 axis[1,0].plot(steps, rewards)
 plt.savefig('./dqn/plots/dqn_plots.png')

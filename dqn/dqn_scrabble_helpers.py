@@ -7,12 +7,18 @@ from collections import namedtuple
 # code inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 
 Transition = namedtuple('Transition',
-                        ('state', 'action', 'next_state', 'reward', 'next_actions'))
+                        ('state', 'action', 'next_state', 'reward'))
 
-class DQNHelpers:
+class DQNScrabbleHelpers:
     @staticmethod
-    def get_state_vector(game):
-        board_dimension = game.board.size
+    def select_training_action(observation, epsilon_start, epsilon_end, epsilon_decay, step, model):
+        # select action
+        state_vector = DQNScrabbleHelpers.get_state_vector(observation.state)
+
+    @staticmethod
+    def get_state_vector(state):
+        board = state
+        board_dimension = board.size
         # 27 = 26 letters in the alphabet + 1 character for empty space
         state = [0] * (board_dimension * board_dimension * 27)
         offset = 0
@@ -27,28 +33,10 @@ class DQNHelpers:
         return torch.tensor([state], dtype = torch.float)
 
     @staticmethod
-    def get_action_vector(word):
-        action = [0] * (26 * 15)
-        for i in range(len(word)):
-            offset = i * 26
-            position = string.ascii_lowercase.index(word[i].lower())
-            action[offset + position] = 1
-        return torch.tensor([action], dtype = torch.float)
-
-    @staticmethod
-    def get_empty_action_vector():
-        action = [0] * (26 * 15)
-        return torch.tensor([action], dtype = torch.float)
-
-    @staticmethod
-    def get_input_vector(game, word):
-        return torch.cat((DQNHelpers.get_state_vector(game), DQNHelpers.get_action_vector(word)), 1)
-
-    @staticmethod
     def calculate_input_size(board_dimension):
         # one vector of length 27 per cell on the board + encoding of action
         # 27 = 26 letters in the alphabet + 1 character for empty space
-        return (board_dimension * board_dimension * 27) + (26 * 15)
+        return (board_dimension * board_dimension * 27)
 
     @staticmethod
     def optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer):
@@ -58,27 +46,15 @@ class DQNHelpers:
         transitions = memory.sample(batch_size)
         batch = Transition(*zip(*transitions))
 
+        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
+                                                batch.next_state)), dtype=torch.bool)
+        non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
+
         state_batch = torch.cat(batch.state)
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
 
-        state_action_batch = torch.cat((state_batch, action_batch), 1)
-        state_action_values = policy_net(state_action_batch)
-
-        # calculate max[Q(s', a)] for each s' in the batch
-        next_state_values = [float('-inf')] * batch_size
-        for i_batch in range(batch_size):
-            next_state = batch.next_state[i_batch]
-            if next_state == None:
-                next_state_values[i_batch] = 0
-                continue
-            next_actions = batch.next_actions[i_batch]
-            next_state_actions = [torch.cat((next_state, next_action), 1) for next_action in next_actions]
-            next_state_actions_tensor = torch.cat(next_state_actions, 0)
-            next_state_values[i_batch] = target_net(next_state_actions_tensor).max().item()
-
-        next_state_values = torch.tensor([next_state_values]).swapaxes(0, 1)
-        expected_state_action_values = (next_state_values * gamma) + reward_batch
+        # calculate state action values and expected state action values here
 
         # compute Huber loss
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values)
@@ -86,8 +62,6 @@ class DQNHelpers:
         # perform backpropogation / update policy network weights
         optimizer.zero_grad()
         loss.backward()
-        for param in policy_net.parameters():
-            param.grad.data.clamp_(-1, 1)
         optimizer.step()
 
         return loss.item()
