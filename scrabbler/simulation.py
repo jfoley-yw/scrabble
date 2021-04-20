@@ -3,16 +3,27 @@ import random
 import copy
 
 class Simulation:
-    LETTERS = ("AAAAAAAAAB"
-               "BCCDDDDEEE"
-               "EEEEEEEEEF"
-               "FGGGHHIIII"
-               "IIIIIJKLLL"
-               "LMMNNNNNNO"
-               "OOOOOOOPPQ"
-               "RRRRRRSSSS"
-               "TTTTTTUUUU"
-               "VVWWXYYZ??")
+    # LETTERS = ("AAAAAAAAAB"
+    #            "BCCDDDDEEE"
+    #            "EEEEEEEEEF"
+    #            "FGGGHHIIII"
+    #            "IIIIIJKLLL"
+    #            "LMMNNNNNNO"
+    #            "OOOOOOOPPQ"
+    #            "RRRRRRSSSS"
+    #            "TTTTTTUUUU"
+    #            "VVWWXYYZ??")
+
+    LETTERS = ("AAAAAB"
+               "BCDEEE"
+               "EEE"
+               "FGGHIIII"
+               "IIJKL"
+               "LMNNO"
+               "OOOPQ"
+               "RRSS"
+               "TTUU"
+               "VWXYZ")
     
     RACK_SIZE = 7
 
