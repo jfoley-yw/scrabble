@@ -19,8 +19,8 @@ gamma = DQNConstants.GAMMA
 # initialize action-replay memory
 memory = ReplayMemory(DQNConstants.REPLAY_MEMORY_SIZE)
 # initialize DQNs
-policy_net = DQN(DQNHelpers.calculate_input_size(15), DQNConstants.HIDDEN_LAYER_SIZE)
-target_net = DQN(DQNHelpers.calculate_input_size(15), DQNConstants.HIDDEN_LAYER_SIZE)
+policy_net = DQN(DQNHelpers.calculate_input_size(11), DQNConstants.HIDDEN_LAYER_SIZE)
+target_net = DQN(DQNHelpers.calculate_input_size(11), DQNConstants.HIDDEN_LAYER_SIZE)
 # initialize optimizer
 optimizer = DQNConstants.OPTIMIZER(policy_net.parameters(), lr = DQNConstants.LEARNING_RATE)
 # keep track of results
