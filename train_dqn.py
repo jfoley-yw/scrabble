@@ -47,11 +47,13 @@ for i_episode in range(num_episodes):
 
         if done:
             next_state = None
+            action_mask = None
         else:
             next_state = DQNScrabbleHelpers.get_state_vector(observation.state)
+            action_mask = torch.tensor([observation.action_mask], dype = torch.float)
 
         # save MDP transition in action-replay memory
-        memory.push(state, action, next_state, reward)
+        memory.push(state, action, next_state, reward, action_mask)
 
         loss = DQNHelpers.optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer)
         losses.append(loss)

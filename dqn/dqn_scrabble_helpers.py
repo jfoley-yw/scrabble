@@ -1,5 +1,6 @@
 import random
 import string
+import math
 import torch
 import torch.nn.functional as F
 from collections import namedtuple
@@ -7,13 +8,24 @@ from collections import namedtuple
 # code inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 
 Transition = namedtuple('Transition',
-                        ('state', 'action', 'next_state', 'reward'))
+                        ('state', 'action', 'next_state', 'reward', 'action_mask'))
 
 class DQNScrabbleHelpers:
     @staticmethod
     def select_training_action(observation, epsilon_start, epsilon_end, epsilon_decay, step, model):
-        # select action
+        sample = random.random()
+        eps_threshold = epsilon_end + (epsilon_start - epsilon_end) * \
+            math.exp(-1. * step / epsilon_decay)
         state_vector = DQNScrabbleHelpers.get_state_vector(observation.state)
+        if sample > eps_threshold:
+            with torch.no_grad():
+                q_values = model(state_vector)
+                action_mask = torch.tensor([observation.action_mask], dype = torch.float)
+                masked_q_values = q_values * action_mask
+            return masked_q_values.max(1).item()
+        else:
+            valid_actions = [a for a, v in enumerate(observation.action_mask) if v == 1]
+            return valid_actions[random.randrange(len(valid_actions))]
 
     @staticmethod
     def get_state_vector(state):
@@ -53,8 +65,17 @@ class DQNScrabbleHelpers:
         state_batch = torch.cat(batch.state)
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
+        action_mask_batch = torch.cat(batch.action_mask)
 
-        # calculate state action values and expected state action values here
+        state_action_values = policy_net(state_batch).gather(1, action_batch)
+
+        target_net_output = target_net(non_final_next_states)
+        masked_target_net_output = target_net_output * action_mask_batch
+        next_state_values = torch.zeros(BATCH_SIZE)
+        next_state_values[non_final_mask] = masked_target_net_output.max(1)[0].detach()
+
+        # Compute the expected Q values
+        expected_state_action_values = (next_state_values * gamma) + reward_batch
 
         # compute Huber loss
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values)

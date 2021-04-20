@@ -2,13 +2,14 @@ from dqn.dqn_simulation import DQNSimulation
 from scrabbler.player import Player
 
 class DQNScrabbleObservation:
-    def __init__(self, state, actions):
+    def __init__(self, state, action_mask):
         self.state = state
-        self.actions = actions
+        self.action_mask = action_mask
 
 class DQNScrabbleEnvironment:
     def __init__(self):
         self.simulation = None
+        self.num_actions = 0
         self.player = None
         self.current_possible_moves = None
 
@@ -16,11 +17,10 @@ class DQNScrabbleEnvironment:
         self.index_action_mapping = dict()
         dictionary_path = '../resources/wwf5/dictionary.txt'
         dictionary_file = open(dictionary_path, 'r')
-        index = 0
         for line in dictionary_file:
-            self.action_index_mapping[line[:-1]] = index
-            self.index_action_mapping[index] = line[:-1]
-            index += 1
+            self.action_index_mapping[line[:-1]] = self.num_actions
+            self.index_action_mapping[self.num_actions] = line[:-1]
+            self.num_actions += 1
         dictionary_file.close()
 
     def reset(self):
@@ -53,11 +53,11 @@ class DQNScrabbleEnvironment:
         board = game.board
         valid_moves = game.find_valid_moves(self.player.rack())
 
-        action_indices = []
+        action_mask = [float('-inf')] * self.num_actions
         self.current_possible_moves = dict()
         for move in valid_moves:
             action_index = self.action_index_mapping[move.word]
-            action_indices.append(action_index)
+            action_mask[action_index] = 1
             self.current_possible_moves[action_index] = move
 
-        return DQNScrabbleObservation(board, action_indices)
+        return DQNScrabbleObservation(board, action_mask)
