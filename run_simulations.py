@@ -4,11 +4,12 @@ from scrabbler.strategy import BaselineStrategy
 from scrabbler.ABStrategy import ABStrategy
 from scrabbler.ShortMonteCarloSimStrategy import ShortMonteCarloSimStrategy
 from scrabbler.MCTSStrategy import MCTSStrategy
+from scrabbler.RandomStrategy import RandomStrategy
 import matplotlib.pyplot as plt
 import sys
 
 def main():
-    n = 1
+    n = 2
     p0scores = []
     p1scores = []
     # p0endgame_scores = []
@@ -18,8 +19,9 @@ def main():
         n = int(sys.argv[1][len("--n="):])
     for i in range(n):
         # player0 = Player(midgame_strategy=BaselineStrategy(), endgame_strategy=ABStrategy(), name="AB Pruning Endgame")
-        player0 = Player(ShortMonteCarloSimStrategy(num_rollouts=3000), name="Short Monte Midgame")
-        # player0 = Player(MCTSStrategy(num_rollouts=1000), name="MCTS midgame")
+        # player0 = Player(ShortMonteCarloSimStrategy(num_rollouts=10), name="Short Monte Midgame")
+        player0 = Player(MCTSStrategy(num_rollouts=100), name="MCTS midgame")
+        # player1 = Player(RandomStrategy(), name="Random")
         player1 = Player(BaselineStrategy(), name="Greedy Endgame")
         p0score, p1score = Simulation.simulate_game(player0, player1)
         p0scores.append(p0score)

@@ -20,14 +20,18 @@ class ShortMonteCarloSimStrategy(Strategy):
     #            "TTTTTTUUUU"
     #            "VVWWXYYZ")  # TODO - deleted the question marks to remove issue of deducing bag
 
-    LETTERS = ("AAAB"
+    LETTERS = ("AAAAAB"
+               "BCDEEE"
                "EEE"
-               "EE"
-               "FII"
-               "IJKL"
-               "LMO")
+               "FGGHIIII"
+               "IIJKL"
+               "LMNNO"
+               "OOOPQ"
+               "RRSS"
+               "TTUU"
+               "VWXYZ")
 
-    RACK_SIZE = 4
+    RACK_SIZE = 7
 
     def __init__(self, num_rollouts = 3, time_limit = 300, exploration_weight=1):
         self.num_rollouts = num_rollouts
@@ -43,14 +47,10 @@ class ShortMonteCarloSimStrategy(Strategy):
         self.num_best_moves = 0
         self.best_moves = []
 
-    # def add_dictionary(self, dictionary):
-    #     self.dictionary = dictionary
-
     def choose_move(self, game, rack, current_score_differential, other_rack, dictionary):  #, is_player1):
         self.board = copy.deepcopy(game.board)
         print('Starting Rollouts: ')
         self.dictionary = dictionary
-        # self.is_player1 = is_player1
         self.my_rack = copy.copy(rack)
         self.move_to_score_differential = defaultdict(int)
         self.move_to_visits = defaultdict(int)
@@ -177,8 +177,8 @@ class ShortMonteCarloSimStrategy(Strategy):
         if not moves:
             return
 
-        move = random.choice(moves)
-        # move = moves[0]  # TODO - not random simulation but logic move instead
+        # move = random.choice(moves)
+        move = moves[0]  # TODO - not random simulation but logic move instead
 
         start_square = move.start_square
         word = move.word
