@@ -19,8 +19,8 @@ epsilon_decay = DQNConstants.EPSILON_DECAY
 # initialize action-replay memory
 memory = ReplayMemory(DQNConstants.REPLAY_MEMORY_SIZE)
 # initialize DQNs
-policy_net = DQN(DQNScrabbleHelpers.calculate_input_size(5), DQNConstants.HIDDEN_LAYER_SIZE, 100)
-target_net = DQN(DQNScrabbleHelpers.calculate_input_size(5), DQNConstants.HIDDEN_LAYER_SIZE, 100)
+policy_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 2)
+target_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 2)
 # initialize optimizer
 optimizer = DQNConstants.OPTIMIZER(policy_net.parameters(), lr = DQNConstants.LEARNING_RATE)
 # keep track of results

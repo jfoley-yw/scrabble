@@ -17,7 +17,7 @@ class Game:
     """stores information about a game"""
     DICTIONARY = None
 
-    def __init__(self, filename="", board="wwf5"):
+    def __init__(self, filename="", board="wwf3"):
         """constructor for a game
 
         Args:

@@ -14,16 +14,18 @@ class Simulation:
     #            "TTTTTTUUUU"
     #            "VVWWXYYZ??")
 
-    LETTERS = ("AAAAAB"
-               "BCDEEE"
-               "EEE"
-               "FGGHIIII"
-               "IIJKL"
-               "LMNNO"
-               "OOOPQ"
-               "RRSS"
-               "TTUU"
-               "VWXYZ")
+    # LETTERS = ("AAAAAB"
+    #            "BCDEEE"
+    #            "EEE"
+    #            "FGGHIIII"
+    #            "IIJKL"
+    #            "LMNNO"
+    #            "OOOPQ"
+    #            "RRSS"
+    #            "TTUU"
+    #            "VWXYZ")
+
+    LETTERS = ("AAAAAAAAEEEEEEEEQQQQQQQQZZZZZZZZ")
     
     RACK_SIZE = 7
 
