@@ -45,10 +45,7 @@ class DQNScrabbleEnvironment:
 
         done = (self.simulation.is_rack_empty() or len(observation.actions) == 0)
 
-        return (observation, reward, done)
-
-    def get_final_score(self):
-        return self.player.get_score()
+        return (observation, reward, done, self.player.get_score())
 
     def get_observation(self):
         game = self.simulation.game

@@ -36,13 +36,14 @@ env = DQNScrabbleEnvironment()
 
 for i_episode in range(num_episodes):
     observation, done = env.reset()
+    score = 0
 
     # start the episode
     while not done:
         state = DQNScrabbleHelpers.get_state_vector(observation.state)
         action = DQNScrabbleHelpers.select_training_action(observation, epsilon_start, epsilon_end, epsilon_decay, total_steps, policy_net)
 
-        observation, reward, done = env.step(action)
+        observation, reward, done, score = env.step(action)
 
         action = torch.tensor([[action]], dtype = torch.int64) # need int64 for indexing in torch.gater(dim, index)
         reward = torch.tensor([[reward]], dtype = torch.float)
@@ -67,7 +68,7 @@ for i_episode in range(num_episodes):
         if total_steps % target_update == 0:
             target_net.load_state_dict(policy_net.state_dict())
 
-    results.append(env.get_final_score())
+    results.append(score)
 
     print("EPISODE %d COMPLETED!" % (i_episode))
 
