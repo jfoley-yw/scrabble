@@ -16,14 +16,12 @@ class DQNScrabbleEnvironment:
         self.current_possible_moves = None
 
         self.action_index_mapping = dict()
-        self.index_action_mapping = dict()
 
         script_path = os.path.dirname(__file__)
         dictionary_path = os.path.join(script_path, '../resources/wwf5/dictionary.txt')
         dictionary_file = open(dictionary_path, 'r')
         for line in dictionary_file:
             self.action_index_mapping[line[:-1]] = self.num_actions
-            self.index_action_mapping[self.num_actions] = line[:-1]
             self.num_actions += 1
         dictionary_file.close()
 
