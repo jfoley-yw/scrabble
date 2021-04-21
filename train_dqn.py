@@ -36,11 +36,11 @@ env = DQNScrabbleEnvironment()
 
 for i_episode in range(num_episodes):
     observation, done = env.reset()
+    state = DQNScrabbleHelpers.get_state_vector(observation.state)
     score = 0
 
     # start the episode
     while not done:
-        state = DQNScrabbleHelpers.get_state_vector(observation.state)
         action = DQNScrabbleHelpers.select_training_action(observation, epsilon_start, epsilon_end, epsilon_decay, total_steps, policy_net)
 
         observation, reward, done, score = env.step(action)
@@ -62,6 +62,7 @@ for i_episode in range(num_episodes):
         loss = DQNScrabbleHelpers.optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer)
         losses.append(loss)
 
+        state = next_state
         total_steps += 1
 
         # update target network when necessary
