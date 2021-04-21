@@ -67,8 +67,6 @@ class ShortMonteCarloSimStrategy(Strategy):
             self.board = copy.deepcopy(game.board)
             move_index_being_explored = (move_index_being_explored + 1) % num_best_moves
         best_move = self.get_best_move()
-        # print('Rewards: ', self.reward_dict[current_game_state])
-        # print('Visits: ', self.visits_dict[current_game_state])
         return best_move
 
     def find_plausible_opponent_rack(self, my_rack):
@@ -214,10 +212,6 @@ class ShortMonteCarloSimStrategy(Strategy):
             coordinate = self.board.offset(coordinate, direction, 1)
 
         self.move_to_score_differential[self.current_initial_move] -= move.score
-        # if self.is_my_turn:
-        #     self.move_to_score_differential[self.current_initial_move] -= move.score
-        # else:
-        #     self.move_to_score_differential[self.current_initial_move] += move.score
 
         self.simulate_my_final_move(my_rack)
 
@@ -233,15 +227,6 @@ class ShortMonteCarloSimStrategy(Strategy):
         move = moves[0]  # TODO - not random simulation but logic move instead
 
         self.move_to_score_differential[self.current_initial_move] += move.score
-        # if self.is_my_turn:
-        #     self.move_to_score_differential[self.current_initial_move] += move.score
-        # else:
-        #     self.move_to_score_differential[self.current_initial_move] -= move.score
 
     def get_best_move(self):
         return max(self.move_to_score_differential.keys(), key = lambda move: self.move_to_score_differential[move] / self.move_to_visits[move])
-        # if self.is_player1:
-        #     return max(self.move_to_score_differential.keys(), key = lambda move: self.move_to_score_differential[move] / self.move_to_visits[move])
-        # else:
-        #     return min(self.move_to_score_differential.keys(), key = lambda move: self.move_to_score_differential[move] / self.move_to_visits[move])
-
