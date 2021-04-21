@@ -3,8 +3,8 @@ import math
 
 start = 1.0
 end = 0.1
-decay = 60000
-steps = 300000
+decay = 20000
+steps = 100000
 
 thresholds = []
 
