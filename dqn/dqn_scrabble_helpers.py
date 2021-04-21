@@ -20,12 +20,11 @@ class DQNScrabbleHelpers:
         if sample > eps_threshold:
             with torch.no_grad():
                 q_values = model(state_vector)
-                action_mask = torch.tensor([observation.action_mask], dype = torch.float)
-                masked_q_values = q_values * action_mask
-            return masked_q_values.max(1).item()
+                action_mask = torch.tensor([observation.action_mask], dtype = torch.float)
+                masked_q_values = q_values + action_mask
+            return masked_q_values.max(1).indices.item()
         else:
-            valid_actions = [a for a, v in enumerate(observation.action_mask) if v == 1]
-            return valid_actions[random.randrange(len(valid_actions))]
+            return random.choice(observation.actions)
 
     @staticmethod
     def get_state_vector(state):
@@ -36,7 +35,7 @@ class DQNScrabbleHelpers:
         offset = 0
         for i in range(board_dimension):
             for j in range(board_dimension):
-                tile = game.board.square(i, j).tile
+                tile = board.square(i, j).tile
                 position = 26
                 if tile != None:
                     position = string.ascii_lowercase.index(tile.lower())
@@ -61,17 +60,17 @@ class DQNScrabbleHelpers:
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                                 batch.next_state)), dtype=torch.bool)
         non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
+        non_final_action_masks = torch.cat([batch.action_mask[i] for i in range(batch_size) if batch.next_state[i] is not None])
 
         state_batch = torch.cat(batch.state)
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
-        action_mask_batch = torch.cat(batch.action_mask)
 
         state_action_values = policy_net(state_batch).gather(1, action_batch)
 
         target_net_output = target_net(non_final_next_states)
-        masked_target_net_output = target_net_output * action_mask_batch
-        next_state_values = torch.zeros(BATCH_SIZE)
+        masked_target_net_output = target_net_output + non_final_action_masks
+        next_state_values = torch.zeros(batch_size)
         next_state_values[non_final_mask] = masked_target_net_output.max(1)[0].detach()
 
         # Compute the expected Q values

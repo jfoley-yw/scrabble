@@ -19,8 +19,8 @@ epsilon_decay = DQNConstants.EPSILON_DECAY
 # initialize action-replay memory
 memory = ReplayMemory(DQNConstants.REPLAY_MEMORY_SIZE)
 # initialize DQNs
-policy_net = DQN(DQNHelpers.calculate_input_size(5), DQNConstants.HIDDEN_LAYER_SIZE)
-target_net = DQN(DQNHelpers.calculate_input_size(5), DQNConstants.HIDDEN_LAYER_SIZE)
+policy_net = DQN(DQNScrabbleHelpers.calculate_input_size(5), DQNConstants.HIDDEN_LAYER_SIZE, 100)
+target_net = DQN(DQNScrabbleHelpers.calculate_input_size(5), DQNConstants.HIDDEN_LAYER_SIZE, 100)
 # initialize optimizer
 optimizer = DQNConstants.OPTIMIZER(policy_net.parameters(), lr = DQNConstants.LEARNING_RATE)
 # keep track of results
@@ -39,23 +39,26 @@ for i_episode in range(num_episodes):
 
     # start the episode
     while not done:
-        state = observation.state
+        state = DQNScrabbleHelpers.get_state_vector(observation.state)
         action = DQNScrabbleHelpers.select_training_action(observation, epsilon_start, epsilon_end, epsilon_decay, total_steps, policy_net)
 
-        observation, reward, done, _ = env.step(action)
-        rewards.append(torch.tensor([[reward]], dtype = torch.float))
+        observation, reward, done = env.step(action)
+
+        action = torch.tensor([[action]], dtype = torch.int64) # need int64 for indexing in torch.gater(dim, index)
+        reward = torch.tensor([[reward]], dtype = torch.float)
+        rewards.append(reward)
 
         if done:
             next_state = None
-            action_mask = None
         else:
             next_state = DQNScrabbleHelpers.get_state_vector(observation.state)
-            action_mask = torch.tensor([observation.action_mask], dype = torch.float)
+        
+        action_mask = torch.tensor([observation.action_mask], dtype = torch.float)
 
         # save MDP transition in action-replay memory
         memory.push(state, action, next_state, reward, action_mask)
 
-        loss = DQNHelpers.optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer)
+        loss = DQNScrabbleHelpers.optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer)
         losses.append(loss)
 
         total_steps += 1

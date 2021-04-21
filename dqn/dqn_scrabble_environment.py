@@ -1,9 +1,11 @@
+import os
 from dqn.dqn_simulation import DQNSimulation
 from scrabbler.player import Player
 
 class DQNScrabbleObservation:
-    def __init__(self, state, action_mask):
+    def __init__(self, state, actions, action_mask):
         self.state = state
+        self.actions = actions
         self.action_mask = action_mask
 
 class DQNScrabbleEnvironment:
@@ -15,7 +17,9 @@ class DQNScrabbleEnvironment:
 
         self.action_index_mapping = dict()
         self.index_action_mapping = dict()
-        dictionary_path = '../resources/wwf5/dictionary.txt'
+
+        script_path = os.path.dirname(__file__)
+        dictionary_path = os.path.join(script_path, '../resources/wwf5/dictionary.txt')
         dictionary_file = open(dictionary_path, 'r')
         for line in dictionary_file:
             self.action_index_mapping[line[:-1]] = self.num_actions
@@ -25,7 +29,7 @@ class DQNScrabbleEnvironment:
 
     def reset(self):
         self.player = Player(None)
-        self.simulation = DQNSimulation(player, player)
+        self.simulation = DQNSimulation(self.player, self.player)
         observation = self.get_observation()
         done = (len(observation.actions) == 0)
         return observation, done
@@ -43,21 +47,23 @@ class DQNScrabbleEnvironment:
 
         done = (self.simulation.is_rack_empty() or len(observation.actions) == 0)
 
-        return (observation, reward, done, None)
+        return (observation, reward, done)
 
-    def get_final_score():
+    def get_final_score(self):
         return self.player.get_score()
 
     def get_observation(self):
         game = self.simulation.game
         board = game.board
-        valid_moves = game.find_valid_moves(self.player.rack())
+        valid_moves = game.find_valid_moves(self.player.get_rack())
 
         action_mask = [float('-inf')] * self.num_actions
+        actions = []
         self.current_possible_moves = dict()
         for move in valid_moves:
-            action_index = self.action_index_mapping[move.word]
-            action_mask[action_index] = 1
+            action_index = self.action_index_mapping[move.word.lower()]
+            action_mask[action_index] = 0
+            actions.append(action_index)
             self.current_possible_moves[action_index] = move
 
-        return DQNScrabbleObservation(board, action_mask)
+        return DQNScrabbleObservation(board, actions, action_mask)
