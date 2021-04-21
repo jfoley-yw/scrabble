@@ -2,8 +2,13 @@ from scrabbler.simulation import Simulation
 from scrabbler.player import Player
 from scrabbler.strategy import BaselineStrategy
 from scrabbler.ABStrategy import ABStrategy
+from dqn.dqn_strategy import DQNStrategy
+from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
+from dqn.dqn_constants import DQNConstants
+from dqn.dqn import DQN
 import matplotlib.pyplot as plt
 import sys
+import torch
 
 def main():
     n = 2
@@ -14,9 +19,13 @@ def main():
 
     if len(sys.argv) > 1 and sys.argv[1].startswith("--n="):
         n = int(sys.argv[1][len("--n="):])
+
+    dqn_model = DQN(DQNScrabbleHelpers.calculate_input_size(5), DQNConstants.HIDDEN_LAYER_SIZE, 100)
+    dqn_model.load_state_dict(torch.load('./dqn/models/policy_net_final.pt'))
+    dqn_strategy = DQNStrategy(dqn_model)
     for i in range(n):
-        player0 = Player(midgame_strategy=BaselineStrategy(), endgame_strategy=ABStrategy(), name="AB Pruning Endgame")
-        player1 = Player(BaselineStrategy(), name="Greedy Endgame")
+        player0 = Player(dqn_strategy, name="DQN Full-Game")
+        player1 = Player(BaselineStrategy(), name="Baseline Full-Game")
         p0score, p1score = Simulation.simulate_game(player0, player1)
         p0scores.append(p0score)
         p1scores.append(p1score)
