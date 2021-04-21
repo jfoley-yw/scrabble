@@ -33,13 +33,10 @@ class DQNScrabbleEnvironment:
         return observation, done
 
     def step(self, action):
-        current_player_score = self.player.get_score()
-
         move = self.current_possible_moves[action]
-        self.simulation.simulate_step(move)
+        reward = move.score
 
-        new_player_score = self.player.get_score()
-        reward = new_player_score - current_player_score
+        self.simulation.simulate_step(move)
 
         observation = self.get_observation()
 
