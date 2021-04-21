@@ -19,7 +19,7 @@ class DQNScrabbleHelpers:
         state_vector = DQNScrabbleHelpers.get_state_vector(observation.state)
         if sample > eps_threshold:
             with torch.no_grad():
-                q_values = model(state_vector)
+                q_values = model(state_vector).detach()
                 action_mask = torch.tensor([observation.action_mask], dtype = torch.float)
                 masked_q_values = q_values + action_mask
             return masked_q_values.max(1).indices.item()
@@ -68,10 +68,10 @@ class DQNScrabbleHelpers:
 
         state_action_values = policy_net(state_batch).gather(1, action_batch)
 
-        target_net_output = target_net(non_final_next_states)
+        target_net_output = target_net(non_final_next_states).detach()
         masked_target_net_output = target_net_output + non_final_action_masks
         next_state_values = torch.zeros(batch_size)
-        next_state_values[non_final_mask] = masked_target_net_output.max(1)[0].detach()
+        next_state_values[non_final_mask] = masked_target_net_output.max(1)[0]
 
         # Compute the expected Q values
         expected_state_action_values = (next_state_values * gamma) + reward_batch
