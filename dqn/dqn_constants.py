@@ -2,7 +2,7 @@ import torch.optim as optim
 
 class DQNConstants:
     EPISODES = 143000
-    BATCH_SIZE = 64
+    BATCH_SIZE = 512
     TARGET_UPDATE = 100000
     GAMMA = 0.99
     REPLAY_MEMORY_SIZE = 40000
