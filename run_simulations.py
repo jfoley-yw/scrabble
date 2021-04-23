@@ -4,7 +4,7 @@ from scrabbler.strategy import BaselineStrategy
 from scrabbler.ABStrategy import ABStrategy
 from dqn.dqn_strategy import DQNStrategy
 from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
-from dqn.dqn_constants import DQNConstants
+from dqn.dqn_constants_3_x_3 import DQNConstants
 from dqn.dqn import DQN
 import matplotlib.pyplot as plt
 import sys

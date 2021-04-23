@@ -25,9 +25,9 @@ class Simulation:
     #            "TTUU"
     #            "VWXYZ")
 
-    LETTERS = ("AAAAAAAAEEEEEEEEQQQQQQQQZZZZZZZZ")
+    LETTERS = ("QQQQXXXXVVVVGGGGDDDDAAAA")
     
-    RACK_SIZE = 7
+    RACK_SIZE = 24
 
     @staticmethod
     def simulate_game(player1, player2, start_player = None):

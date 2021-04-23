@@ -1,6 +1,7 @@
 import torch
+import collections
 import matplotlib.pyplot as plt
-from dqn.dqn_constants import DQNConstants
+from dqn.dqn_constants_3_x_3 import DQNConstants
 from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
 from dqn.dqn_scrabble_helpers import ReplayMemory
 from dqn.dqn import DQN
@@ -19,8 +20,8 @@ epsilon_decay = DQNConstants.EPSILON_DECAY
 # initialize action-replay memory
 memory = ReplayMemory(DQNConstants.REPLAY_MEMORY_SIZE)
 # initialize DQNs
-policy_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 2)
-target_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 2)
+policy_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 16)
+target_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 16)
 # initialize optimizer
 optimizer = DQNConstants.OPTIMIZER(policy_net.parameters(), lr = DQNConstants.LEARNING_RATE)
 # keep track of results
@@ -44,10 +45,10 @@ for i_episode in range(num_episodes):
         action = DQNScrabbleHelpers.select_training_action(observation, epsilon_start, epsilon_end, epsilon_decay, total_steps, policy_net)
 
         observation, reward, done, score = env.step(action)
+        rewards.append(reward)
 
         action = torch.tensor([[action]], dtype = torch.int64) # need int64 for indexing in torch.gater(dim, index)
         reward = torch.tensor([[reward]], dtype = torch.float)
-        rewards.append(reward)
 
         if done:
             next_state = None
@@ -73,18 +74,32 @@ for i_episode in range(num_episodes):
 
     print("EPISODE %d COMPLETED!" % (i_episode))
 
+print(total_steps)
+
 # save policy net parameters to a file
 torch.save(policy_net.state_dict(), './dqn/models/policy_net_final.pt')
 
+# reward_dict = collections.defaultdict(int)
+# for i in range(len(rewards)):
+#     reward_dict[rewards[i]] += 1
+
+# scores_dict = collections.defaultdict(int)
+# for i in range(len(results)):
+#     scores_dict[results[i]] += 1
+
 # aggregate data for plotting
-episodes = [i for i in range(num_episodes)]
-steps = [i for i in range(0, total_steps, 10)]
+episodes = [i for i in range(0, num_episodes, 100)]
+results = [results[i] for i in range(0, num_episodes, 100)]
+loss_steps = [i for i in range(0, total_steps, 10)]
+reward_steps = [i for i in range(0, total_steps, 250)]
 losses = [losses[i] for i in range(0, total_steps, 10)]
-rewards = [rewards[i] for i in range(0, total_steps, 10)]
+rewards = [rewards[i] for i in range(0, total_steps, 250)]
 
 # construct episodes vs. scores plot, iterations vs. losses plot, iterations vs. rewards plot
 _, axis = plt.subplots(2, 2)
+# axis[0, 0].bar(list(scores_dict.keys()), list(scores_dict.values()))
 axis[0, 0].plot(episodes, results)
-axis[0, 1].plot(steps, losses)
-axis[1,0].plot(steps, rewards)
+axis[0, 1].plot(loss_steps, losses)
+axis[1, 0].plot(reward_steps, rewards)
+# axis[1,0].bar(list(reward_dict.keys()), list(reward_dict.values()))
 plt.savefig('./dqn/plots/dqn_plots.png')
