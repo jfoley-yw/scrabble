@@ -10,5 +10,5 @@ class DQNConstants:
     LEARNING_RATE = 0.000001
     EPSILON_START = 1.0
     EPSILON_END = 0.1
-    EPSILON_DECAY = 10000
+    EPSILON_DECAY = 14000
     OPTIMIZER = optim.Adam

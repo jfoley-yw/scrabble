@@ -1,7 +1,7 @@
 import torch
 import collections
 import matplotlib.pyplot as plt
-from dqn.dqn_constants_3_x_3 import DQNConstants
+from dqn.dqn_constants_4_x_4 import DQNConstants
 from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
 from dqn.dqn_scrabble_helpers import ReplayMemory
 from dqn.dqn import DQN
@@ -20,8 +20,8 @@ epsilon_decay = DQNConstants.EPSILON_DECAY
 # initialize action-replay memory
 memory = ReplayMemory(DQNConstants.REPLAY_MEMORY_SIZE)
 # initialize DQNs
-policy_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 10)
-target_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 10)
+policy_net = DQN(DQNScrabbleHelpers.calculate_input_size(4), DQNConstants.HIDDEN_LAYER_SIZE, 20)
+target_net = DQN(DQNScrabbleHelpers.calculate_input_size(4), DQNConstants.HIDDEN_LAYER_SIZE, 20)
 # initialize optimizer
 optimizer = DQNConstants.OPTIMIZER(policy_net.parameters(), lr = DQNConstants.LEARNING_RATE)
 # keep track of results
