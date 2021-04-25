@@ -1,6 +1,7 @@
 from scrabbler.scrabbler import Game
 import random
 import copy
+from collections import defaultdict
 
 class Simulation:
     # LETTERS = ("AAAAAAAAAB"
@@ -38,6 +39,8 @@ class Simulation:
         # List of letters we can still  pick from.
         self.bag = list(Simulation.LETTERS)
         self.players = (player1, player2)
+        self.letter_to_points = defaultdict(int)
+        self.letter_to_plays = defaultdict(int)
         if start_player != None:
             self.player = start_player
         else:   
@@ -59,7 +62,7 @@ class Simulation:
        
         p1_score = self.players[1].get_score()
         p0_score = self.players[0].get_score()
-        return p0_score, p1_score
+        return p0_score, p1_score, self.letter_to_points, self.letter_to_plays
 
     def simulate_step(self):
         done = self.exectute_turn()
@@ -85,6 +88,9 @@ class Simulation:
 
         # If a valid move exists, then make best move, otherwise end game
         if best_move:
+            for letter in best_move.word:
+                self.letter_to_plays[letter] += 1
+                self.letter_to_points[letter] += best_move.score
             self.make_move(best_move)
             self.generate_new_rack()
             return True

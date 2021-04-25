@@ -1,7 +1,7 @@
 import random
 
-inpt_path = './resources/wwf11/old_dictionary.txt'
-output_path = './resources/wwf5/dictionary.txt'
+inpt_path = './old_dictionary.txt'
+output_path = './dictionary.txt'
 inpt = open(inpt_path, 'r')
 output = open(output_path, 'w')
 
