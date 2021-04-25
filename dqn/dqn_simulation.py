@@ -7,8 +7,8 @@ class DQNSimulation(Simulation):
 
     def exectute_turn(self, action):
         print("########################## Player %d turn ############################"%(self.player + 1))
-        print("Bag: %s" % "".join(self.bag))
-        print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
+        # print("Bag: %s" % "".join(self.bag))
+        # print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
 
         self.make_move(action)
         self.generate_new_rack()

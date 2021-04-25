@@ -1,4 +1,5 @@
 from scrabbler.scrabbler import Game
+from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
 import random
 import copy
 
@@ -25,9 +26,13 @@ class Simulation:
     #            "TTUU"
     #            "VWXYZ")
 
-    LETTERS = ("QQQQXXXXVVVVGGGGDDDDAAAA")
+    # LETTERS = "QQQQXXXXVVVVGGGGDDDDAAAA"
+
+    # LETTERS = "AAAAAQQQQQ"
+
+    LETTERS = DQNScrabbleHelpers.create_uniform_letters()
     
-    RACK_SIZE = 24
+    RACK_SIZE = 50
 
     @staticmethod
     def simulate_game(player1, player2, start_player = None):
@@ -77,7 +82,7 @@ class Simulation:
 
         print("########################## Player %d turn ############################"%(self.player + 1))
         print("Bag: %s" % "".join(self.bag))
-        print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
+        # print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
 
         if self.player == 0:
             other_player = 1
@@ -99,7 +104,7 @@ class Simulation:
     def generate_new_rack(self):
         """ Generates new rack after drawing tiles from the bag and prints out the new rack before and after the draw."""
         self.generate_rack_and_bag(self.player)
-        print("Player %d rack post-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
+        # print("Player %d rack post-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
 
     def generate_rack_and_bag(self, player):
         """Randomly chooses tiles from bag and places in rack"""

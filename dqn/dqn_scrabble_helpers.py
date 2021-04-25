@@ -12,6 +12,14 @@ Transition = namedtuple('Transition',
 
 class DQNScrabbleHelpers:
     @staticmethod
+    def create_uniform_letters():
+        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        letters = ""
+        for letter in alphabet:
+            letters += (letter * 10)
+        return letters
+
+    @staticmethod
     def select_training_action(observation, epsilon_start, epsilon_end, epsilon_decay, step, model):
         sample = random.random()
         eps_threshold = epsilon_end + (epsilon_start - epsilon_end) * \

@@ -20,8 +20,8 @@ epsilon_decay = DQNConstants.EPSILON_DECAY
 # initialize action-replay memory
 memory = ReplayMemory(DQNConstants.REPLAY_MEMORY_SIZE)
 # initialize DQNs
-policy_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 16)
-target_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 16)
+policy_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 10)
+target_net = DQN(DQNScrabbleHelpers.calculate_input_size(3), DQNConstants.HIDDEN_LAYER_SIZE, 10)
 # initialize optimizer
 optimizer = DQNConstants.OPTIMIZER(policy_net.parameters(), lr = DQNConstants.LEARNING_RATE)
 # keep track of results
@@ -74,8 +74,6 @@ for i_episode in range(num_episodes):
 
     print("EPISODE %d COMPLETED!" % (i_episode))
 
-print(total_steps)
-
 # save policy net parameters to a file
 torch.save(policy_net.state_dict(), './dqn/models/policy_net_final.pt')
 
@@ -87,13 +85,16 @@ torch.save(policy_net.state_dict(), './dqn/models/policy_net_final.pt')
 # for i in range(len(results)):
 #     scores_dict[results[i]] += 1
 
+print(total_steps)
+print(total_steps / num_episodes)
+
 # aggregate data for plotting
-episodes = [i for i in range(0, num_episodes, 100)]
-results = [results[i] for i in range(0, num_episodes, 100)]
+episodes = [i for i in range(0, num_episodes, 10)]
+results = [results[i] for i in range(0, num_episodes, 10)]
 loss_steps = [i for i in range(0, total_steps, 10)]
-reward_steps = [i for i in range(0, total_steps, 250)]
 losses = [losses[i] for i in range(0, total_steps, 10)]
-rewards = [rewards[i] for i in range(0, total_steps, 250)]
+reward_steps = [i for i in range(0, total_steps, 10)]
+rewards = [rewards[i] for i in range(0, total_steps, 10)]
 
 # construct episodes vs. scores plot, iterations vs. losses plot, iterations vs. rewards plot
 _, axis = plt.subplots(2, 2)

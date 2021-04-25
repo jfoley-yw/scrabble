@@ -14,7 +14,7 @@ class DQNStrategy(Strategy):
         self.index_action_mapping = dict()
 
         script_path = os.path.dirname(__file__)
-        dictionary_path = os.path.join(script_path, '../resources/wwf3/dictionary.txt')
+        dictionary_path = os.path.join(script_path, '../resources/wwf4/dictionary.txt')
         dictionary_file = open(dictionary_path, 'r')
         for line in dictionary_file:
             self.action_index_mapping[line[:-1]] = self.num_actions
