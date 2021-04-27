@@ -162,6 +162,9 @@ class Board:
             row_string = "  ".join(tile if tile else "-" for tile in row)
             board_string = board_string + row_string + "\n"
         return board_string
+        
+    def get_board(self):
+        return self._board
 
     def square(self, row, col):
         """gets the square on the given coordinate, return None if out of bounds"""
