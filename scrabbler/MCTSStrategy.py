@@ -6,20 +6,10 @@ from scrabbler.strategy import Strategy
 from collections import defaultdict
 from scrabbler.MCTSgamestate import MCTSgamestate
 
-''' Node must be represented by a state of the board/rack/bag-size. dict with those three props
-should be used as key for a dict from game state -> reward / attempts'''
+''' Represents an implementation of UCT (Upper Confidence bound applied to Trees), which is a
+    type of Monte Carlo Tree Search algorithm.
+'''
 class MCTSStrategy(Strategy):
-    # LETTERS = ("AAAAAAAAAB"
-    #            "BCCDDDDEEE"
-    #            "EEEEEEEEEF"
-    #            "FGGGHHIIII"
-    #            "IIIIIJKLLL"
-    #            "LMMNNNNNNO"
-    #            "OOOOOOOPPQ"
-    #            "RRRRRRSSSS"
-    #            "TTTTTTUUUU"
-    #            "VVWWXYYZ??")
-
     LETTERS = ("AAAAAB"
                "BCDEEE"
                "EEE"
@@ -33,18 +23,24 @@ class MCTSStrategy(Strategy):
 
     RACK_SIZE = 7
 
-    def __init__(self, num_rollouts = 3, explore_factor=1):
+    ''' Initialize strategy with the number of rollouts to do, the exploration factor, map of states->rewards,
+        map of state->simulation visits, map of states->child states, map of tiles->value, and map of 
+        states->move required to get between them.
+    '''
+    def __init__(self, num_rollouts = 300, exploration_factor=1):
         self.num_rollouts = num_rollouts
         self.reward_dict = defaultdict(int)
         self.visits_dict = defaultdict(int)
         self.next_states = {}
         self.dictionary = None
-        self.explore_factor = explore_factor
+        self.explore_factor = exploration_factor
         self.tiles = {'A': 1, 'B': 3, 'C': 3, 'D': 2, 'E': 1, 'F': 4, 'G': 2, 'H': 4, 'I': 1, 'J': 8, 'K': 5, 'L': 1,
                          'M': 3, 'N': 1, 'O': 1, 'P': 3, 'Q': 10, 'R': 1, 'S': 1, 'T': 1, 'U': 1, 'V': 4, 'W': 4, 'X': 8,
                          'Y': 4, 'Z': 10}
         self.move_between_states = {}
 
+    ''' Choose the estimated best move by performing rollouts 
+    '''
     def choose_move(self, game, rack, current_score_differential, other_rack, dictionary):
         self.other_rack = other_rack  # Ignore this since we cannot know other player's rack
         self.dictionary = dictionary
@@ -53,14 +49,15 @@ class MCTSStrategy(Strategy):
         current_game_state = MCTSgamestate(tupled_board, tupled_rack, True, current_score_differential)  # True because it is my turn
         self.board = copy.deepcopy(game.board)
         self.original_board = copy.deepcopy(game.board)
+
         print('Starting Rollouts: ')
-        for i in range(self.num_rollouts):
+        for i in range(self.num_rollouts): 
             self.rollout(current_game_state)
         best_move = self.get_best_move(current_game_state)
-        print('Rewards: ', self.reward_dict[current_game_state])
-        print('Visits: ', self.visits_dict[current_game_state])
         return best_move
 
+    ''' Calculate what letters may be in the bag based on what tiles have already been played
+    '''
     def deduce_potential_bag(self, tupled_board):
         starting_letters = list(MCTSStrategy.LETTERS)
         for i in range(len(tupled_board)):
@@ -75,6 +72,9 @@ class MCTSStrategy(Strategy):
                     raise ValueError
         return starting_letters
 
+    ''' After rollouts have occurred, select the best move from the current game state. The best move
+        has the highest average reward of all possible moves.
+    '''
     def get_best_move(self, game_state):
         if self.is_terminal(game_state):
             return None
@@ -93,6 +93,8 @@ class MCTSStrategy(Strategy):
                 best_next_state = state
         return self.move_between_states[(game_state, best_next_state)]
 
+    ''' Find a random next state after the current game state while simulating. 
+    '''
     def find_random_sim_child(self, game_state):
         next_states = tuple(self.find_next_states(game_state))
         random_next_state = random.choice(next_states)
@@ -101,6 +103,9 @@ class MCTSStrategy(Strategy):
 
         return random_next_state
 
+    ''' Convert the given rack (list of letters) into a tuple representation like what is given in
+        MCTSgamestate.
+    '''
     def tuplify_rack(self, rack):
         char_count = defaultdict(int)
         for char in rack:
@@ -109,6 +114,8 @@ class MCTSStrategy(Strategy):
         rack_tuple = tuple(char_count[char] for char in all_chars)
         return rack_tuple
 
+    ''' Perform one rollout. This includes Selection, Expansion, Simulation, and Backpropagation.
+    '''
     def rollout(self, game_state):
         path_of_game_states = self.select(game_state)
         final_game_state = path_of_game_states[-1]
@@ -119,6 +126,9 @@ class MCTSStrategy(Strategy):
         self.backpropagate(path_of_game_states, reward)
         self.board = copy.deepcopy(self.original_board)
 
+    ''' Select a leaf node in the game tree. Use UCT selection in order to decide which node to 
+        visit while traversing game tree. 
+    '''
     def select(self, game_state):
         path_of_game_states = []
         while True:
@@ -134,6 +144,8 @@ class MCTSStrategy(Strategy):
                 return path_of_game_states
             game_state = self.UCT_next_state(game_state)
 
+    ''' Expand the current node by finding what next game states exist from the current game state.
+    '''
     def expand(self, game_state):
         if game_state not in self.next_states:
             self.next_states[game_state] = self.find_next_states(game_state)
@@ -156,13 +168,18 @@ class MCTSStrategy(Strategy):
             game_state = self.find_random_sim_child(game_state)
             agent_turn = not agent_turn
 
+    ''' Backpropagate rewards to each node in the path taken from the root node. Subsequent nodes will
+        have 1 - reward of the last node since the game is a zero sum game and going up the tree means
+        going back and forth between whose turn it is in that state. 
+    '''
     def backpropagate(self, path, reward):
         for game_state in path[::-1]:
-        # for game_state in reversed(path):
             self.reward_dict[game_state] += reward
             self.visits_dict[game_state] += 1
             reward = 1 - reward
 
+    ''' Select the next state to traverse given a game state, using the exploration-exploitation tradeoff
+        as described by the UCT formula. '''
     def UCT_next_state(self, game_state):
         # Use UCB1 formula to explore and exploit
         best_next_state = None
@@ -178,6 +195,8 @@ class MCTSStrategy(Strategy):
         self.update_board_with_move(self.board, requisite_move)
         return best_next_state
 
+    ''' Update the Board object with move so that the requisite methods from the board object can be used 
+        to generate possible moves after the next state. '''
     def update_board_with_move(self, current_board, move):
         start_square = move.start_square
         word = move.word
@@ -192,10 +211,13 @@ class MCTSStrategy(Strategy):
             current_board.update_cross_set(coordinate, other_direction, self.dictionary)
             coordinate = current_board.offset(coordinate, direction, 1)
 
+    ''' Generate all possible moves from the current game state. 
+    '''
     def find_next_states(self, game_state):
         mid = int(self.board.size / 2)
         curr_rack = self.untuplify_rack(game_state.rack_state)
 
+        # Find all possible moves using the Board object
         if self.board.empty:
             moves = self.board.generate_moves((mid, mid), "across", curr_rack, self.dictionary, self.tiles, {})
         else:
@@ -205,6 +227,7 @@ class MCTSStrategy(Strategy):
 
         next_states = set()
 
+        # For each possible move, update the map of states->children
         for move in moves:
             next_board = [square.tile for square in self.board.get_board()]
             index = move.start_square[0] * self.board.size + move.start_square[1]
@@ -234,6 +257,8 @@ class MCTSStrategy(Strategy):
             self.move_between_states[(game_state, next_game_state)] = move
         return next_states
 
+    ''' Determine if a game state is terminal or not.
+    '''
     def is_terminal(self, game_state):
         # check to see if there are no valid moves
         if game_state.rack_state == (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) \
@@ -241,6 +266,8 @@ class MCTSStrategy(Strategy):
             return True
         return False
 
+    ''' Determine if a game state has any child game states. 
+    '''
     def has_potential_next_states(self, game_state):
         mid = int(self.board.size / 2)
 
@@ -257,6 +284,8 @@ class MCTSStrategy(Strategy):
             return True
         return False
 
+    ''' Convert a tuple representation of a rack to a list of the letters in the rack.
+    '''
     def untuplify_rack(self, rack_state):
         rack = []
         for i in range(len(rack_state)):

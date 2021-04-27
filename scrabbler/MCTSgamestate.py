@@ -1,7 +1,7 @@
+''' Represents a state of the game as well as a node in the state space so that
+    it can be used as a key in dictionaries tracking rewards/visits
+'''
 class MCTSgamestate:
-    ''' Represents a state of the game as well as a node in that state space so that
-        it can be used as a key in dictionaries tracking rewards/visits
-    '''
     def __init__(self, board_state, rack_state, is_my_turn, score_differential):
         # board_state is a tuple of size rows * columns where each entry is the tile on the board
         # or None if there is no tile.
