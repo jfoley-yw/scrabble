@@ -97,10 +97,14 @@ reward_steps = [i for i in range(0, total_steps, 10)]
 rewards = [rewards[i] for i in range(0, total_steps, 10)]
 
 # construct episodes vs. scores plot, iterations vs. losses plot, iterations vs. rewards plot
-_, axis = plt.subplots(2, 2)
+# _, axis = plt.subplots(2, 2)
 # axis[0, 0].bar(list(scores_dict.keys()), list(scores_dict.values()))
-axis[0, 0].plot(episodes, results)
-axis[0, 1].plot(loss_steps, losses)
-axis[1, 0].plot(reward_steps, rewards)
+# axis[0, 0].plot(episodes, results)
+# axis[0, 1].plot(loss_steps, losses)
+# axis[1, 0].plot(reward_steps, rewards)
 # axis[1,0].bar(list(reward_dict.keys()), list(reward_dict.values()))
+plt.plot(loss_steps, losses)
+plt.xlabel('step')
+plt.ylabel('loss')
+plt.title('4x4 Iteration-Loss')
 plt.savefig('./dqn/plots/dqn_plots.png')

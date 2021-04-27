@@ -26,7 +26,7 @@ class Simulation:
     #            "TTUU"
     #            "VWXYZ")
 
-    # LETTERS = "QQQQXXXXVVVVGGGGDDDDAAAA"
+    #LETTERS = "QQQQXXXXVVVVGGGGDDDDAAAA"
 
     # LETTERS = "AAAAAQQQQQ"
 
