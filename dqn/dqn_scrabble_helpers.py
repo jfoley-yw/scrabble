@@ -5,11 +5,10 @@ import torch
 import torch.nn.functional as F
 from collections import namedtuple
 
-# code inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
-
 Transition = namedtuple('Transition',
                         ('state', 'action', 'next_state', 'reward', 'action_mask'))
 
+# Various methods to help train a DQN to play Scrabble
 class DQNScrabbleHelpers:
     @staticmethod
     def create_uniform_letters():
@@ -19,6 +18,8 @@ class DQNScrabbleHelpers:
             letters += (letter * 10)
         return letters
 
+    # code inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
+    # select an action to take based on an Epsilon Greedy exploration policy
     @staticmethod
     def select_training_action(observation, epsilon_start, epsilon_end, epsilon_decay, step, model):
         sample = random.random()
@@ -57,6 +58,8 @@ class DQNScrabbleHelpers:
         # 27 = 26 letters in the alphabet + 1 character for empty space
         return (board_dimension * board_dimension * 27)
 
+    # code inspired by https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
+    # perform gradient descent on a batch of observations
     @staticmethod
     def optimize_model(policy_net, target_net, memory, gamma, batch_size, optimizer):
         if len(memory) < batch_size:
@@ -96,6 +99,7 @@ class DQNScrabbleHelpers:
 
         return loss.item()
 
+# code borrowed from https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
 class ReplayMemory:
     def __init__(self, capacity):
         self.capacity = capacity

@@ -1,5 +1,4 @@
 import torch
-import collections
 import matplotlib.pyplot as plt
 from dqn.dqn_constants_4_x_4 import DQNConstants
 from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
@@ -76,14 +75,6 @@ for i_episode in range(num_episodes):
 
 # save policy net parameters to a file
 torch.save(policy_net.state_dict(), './dqn/models/policy_net_final.pt')
-
-# reward_dict = collections.defaultdict(int)
-# for i in range(len(rewards)):
-#     reward_dict[rewards[i]] += 1
-
-# scores_dict = collections.defaultdict(int)
-# for i in range(len(results)):
-#     scores_dict[results[i]] += 1
 
 print(total_steps)
 print(total_steps / num_episodes)

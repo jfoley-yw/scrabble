@@ -5,6 +5,7 @@ import os
 from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
 from scrabbler.strategy import Strategy
 
+# A Scrabble playing strategy that chooses a move using a pre-trained DQN
 class DQNStrategy(Strategy):
     def __init__(self, model):
         self.model = model

@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import math
 
+# this is a helper script to properly choose the epsilon rate of decay during DQN training
+
 start = 1.0
 end = 0.1
 decay = 14000

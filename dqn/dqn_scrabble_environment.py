@@ -8,6 +8,7 @@ class DQNScrabbleObservation:
         self.actions = actions
         self.action_mask = action_mask
 
+# An MDP environment for Scrabble
 class DQNScrabbleEnvironment:
     def __init__(self):
         self.simulation = None

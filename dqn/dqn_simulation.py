@@ -1,5 +1,6 @@
 from scrabbler.simulation import Simulation
 
+# A subclass of the Simulation class that allows the caller to pass in an action to take during a turn
 class DQNSimulation(Simulation):
     def simulate_step(self, action):
         self.exectute_turn(action)
