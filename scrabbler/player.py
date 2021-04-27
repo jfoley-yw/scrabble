@@ -19,6 +19,9 @@ class Player:
         self.name = name # might be useful for plotting during analysis
         self.endgame_score = None
 
+        self.LETTER_VALUE = {"A": 1, "B":4, "C":4, "D":2, "E":1, "F":4, "G":3, "H":3, "I":1, "J":10, "K":5, "L":2, 
+            "M":4, "N":2, "O":1, "P":4, "Q":10, "R":1, "S":1, "T":1, "U":2, "V":5, "W":4, "X":8, "Y":3, "Z":10}
+
     def choose_move(self, is_endgame, game, other_score, other_rack, dictionary):
         # chooses a move for the player based on the endgame and midgame strategies
         score_diff = self.score - other_score
@@ -58,3 +61,10 @@ class Player:
 
     def set_endgame_score(self):
         self.endgame_score = copy.deepcopy(self.get_score())
+
+    def score_tiles_in_rack(self):
+        if len(self.rack) != 0:
+            for tile in self.rack:
+                self.score - (2*self.LETTER_VALUE[tile])
+        return self.score
+

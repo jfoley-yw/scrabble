@@ -25,7 +25,9 @@ class Simulation:
                "TTUU"
                "VWXYZ")
     
-    RACK_SIZE = 7
+    RACK_SIZE = 5
+
+
 
     @staticmethod
     def simulate_game(player1, player2, start_player = None):
@@ -54,10 +56,12 @@ class Simulation:
         while self.simulate_step():
             self.game.show()
 
+        
         self.print_end_game_message()
        
-        p1_score = self.players[1].get_score()
-        p0_score = self.players[0].get_score()
+        p1_score = self.players[1].score_tiles_in_rack()
+        p0_score = self.players[0].score_tiles_in_rack()
+        
         return p0_score, p1_score
 
     def simulate_step(self):
