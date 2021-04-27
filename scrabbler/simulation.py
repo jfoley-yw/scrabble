@@ -1,4 +1,5 @@
 from scrabbler.scrabbler import Game
+from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
 import random
 import copy
 
@@ -24,8 +25,14 @@ class Simulation:
                "RRSS"
                "TTUU"
                "VWXYZ")
+
+    # LETTERS = "QQQQXXXXVVVVGGGGDDDDAAAA"
+
+    # LETTERS = "AAAAAQQQQQ"
+
+    # LETTERS = DQNScrabbleHelpers.create_uniform_letters()
     
-    RACK_SIZE = 7
+    RACK_SIZE = 5
 
     @staticmethod
     def simulate_game(player1, player2, start_player = None):
@@ -49,15 +56,19 @@ class Simulation:
         self.generate_rack_and_bag(0)
         self.generate_rack_and_bag(1)
 
+        self.most_recent_move = None # needed for dqn
+
     def simulate(self):
         # Keep playing until we're out of tiles or solutions.
         while self.simulate_step():
             self.game.show()
 
+        
         self.print_end_game_message()
        
-        p1_score = self.players[1].get_score()
-        p0_score = self.players[0].get_score()
+        p1_score = self.players[1].score_tiles_in_rack()
+        p0_score = self.players[0].score_tiles_in_rack()
+        
         return p0_score, p1_score
 
     def simulate_step(self):
@@ -73,7 +84,7 @@ class Simulation:
 
         print("########################## Player %d turn ############################"%(self.player + 1))
         print("Bag: %s" % "".join(self.bag))
-        print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
+        # print("Player %d rack pre-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
 
         if self.player == 0:
             other_player = 1
@@ -81,6 +92,8 @@ class Simulation:
             other_player = 0
 
         best_move = self.players[self.player].choose_move(self.endgame, self.game, self.players[other_player].get_score(), self.players[other_player].get_rack(), self.game.dictionary)
+
+        self.most_recent_move = best_move # needed for dqn
 
         # If a valid move exists, then make best move, otherwise end game
         if best_move:
@@ -93,7 +106,7 @@ class Simulation:
     def generate_new_rack(self):
         """ Generates new rack after drawing tiles from the bag and prints out the new rack before and after the draw."""
         self.generate_rack_and_bag(self.player)
-        print("Player %d rack post-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
+        # print("Player %d rack post-draw: %s" % (self.player + 1, self.players[self.player].get_rack()))
 
     def generate_rack_and_bag(self, player):
         """Randomly chooses tiles from bag and places in rack"""

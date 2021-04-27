@@ -1,0 +1,14 @@
+import torch.optim as optim
+
+class DQNConstants:
+    EPISODES = 20000
+    BATCH_SIZE = 128
+    TARGET_UPDATE = 1000
+    GAMMA = 0.99
+    REPLAY_MEMORY_SIZE = 1000
+    HIDDEN_LAYER_SIZE = 20
+    LEARNING_RATE = 0.0000025
+    EPSILON_START = 1.0
+    EPSILON_END = 0.1
+    EPSILON_DECAY = 6000
+    OPTIMIZER = optim.Adam

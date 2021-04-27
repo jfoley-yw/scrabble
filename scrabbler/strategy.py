@@ -23,7 +23,6 @@ class RandomStrategy(Strategy):
     def choose_move(self, game, rack, score_diff, opponents_rack, dictionary):
         # return the valid move with the highest score
         valid_moves = game.find_valid_moves(rack)
-        rand = random.randint(0,len(valid_moves))
         if len(valid_moves) == 0:
             return None
-        return valid_moves[rand]
+        return random.choice(valid_moves)
