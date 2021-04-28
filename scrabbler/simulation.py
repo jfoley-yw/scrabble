@@ -1,5 +1,5 @@
 from scrabbler.scrabbler import Game
-from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
+# from dqn.dqn_scrabble_helpers import DQNScrabbleHelpers
 import random
 import copy
 
