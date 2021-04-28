@@ -115,7 +115,7 @@ class ShortMonteCarloSimStrategy(Strategy):
             if self.board.empty:
                 static_value[move] += (1 / len(move.word)) * highest_score * 0.02
         sorted_moves = sorted(moves, key= lambda move: static_value[move], reverse=True)
-        num_moves = min(3, len(moves))
+        num_moves = min(12, len(moves))
         return sorted_moves[0:num_moves]
 
     ''' Check to see if there might be a Q tile in the bag. It cannot be known for sure if a Q tile
